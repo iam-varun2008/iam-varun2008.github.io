@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { useThree } from "@react-three/fiber";
 
 // Performance Tiers
 export const TIERS = {
@@ -50,7 +49,8 @@ export const usePerformance = () => {
 };
 
 export const PerformanceProvider = ({ children }) => {
-  const [tier, setTier] = useState(TIERS.HIGH); // Default to HIGH, degrade if needed
+  const isBrave = typeof navigator !== "undefined" && Boolean(navigator.brave);
+  const [tier, setTier] = useState(isBrave ? TIERS.MEDIUM : TIERS.HIGH);
   const [isDetecting, setIsDetecting] = useState(true);
 
   useEffect(() => {
@@ -60,6 +60,13 @@ export const PerformanceProvider = ({ children }) => {
       // 1. Mobile Check
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       if (isMobile) {
+        detectedTier = TIERS.MEDIUM;
+      }
+
+      // Brave may expose a restricted or software-backed WebGL context even on
+      // powerful machines. Start conservatively to avoid an immediate context
+      // loss, while preserving the full scene and animations.
+      if (isBrave) {
         detectedTier = TIERS.MEDIUM;
       }
 
@@ -85,7 +92,7 @@ export const PerformanceProvider = ({ children }) => {
     };
 
     detectTier();
-  }, []);
+  }, [isBrave]);
 
   // Function to manually downgrade tier (called by PerformanceMonitor)
   const downgradeTier = () => {

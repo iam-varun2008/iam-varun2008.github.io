@@ -47,6 +47,59 @@ body {
     z-index: 1;
 }
 
+.webgl-fallback {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    z-index: 2;
+    color: #311059;
+    background:
+        repeating-linear-gradient(0deg, transparent 0 39px, rgba(49, 16, 89, 0.05) 40px),
+        #fdf8e2;
+    font-family: $font-handwritten;
+
+    p {
+        margin: 0;
+        font-size: 1.1rem;
+        color: #311059;
+    }
+
+    button {
+        padding: 0.65rem 1rem;
+        border: 1px solid #311059;
+        background: rgba(255, 255, 255, 0.65);
+        font-weight: 700;
+    }
+
+    &__door {
+        width: 180px;
+        padding: 0.65rem;
+        border: 3px solid #311059;
+        background: #f6efd5;
+        text-align: center;
+        box-shadow: 7px 7px 0 rgba(49, 16, 89, 0.14);
+
+        span {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+        }
+    }
+
+    &__door-panel {
+        height: 180px;
+        border: 2px solid #311059;
+        background:
+            radial-gradient(circle at 82% 52%, #311059 0 4px, transparent 5px),
+            linear-gradient(90deg, transparent 49%, rgba(49, 16, 89, 0.35) 50%, transparent 51%);
+    }
+}
+
 // UI Overlay
 .ui-overlay {
     position: fixed;

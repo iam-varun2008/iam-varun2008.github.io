@@ -1,4 +1,4 @@
-import { useState, Suspense, useEffect, useCallback, lazy } from 'react';
+import { useState, Suspense, useEffect, useCallback, useRef, lazy } from 'react';
 import { Canvas, useThree, useLoader } from '@react-three/fiber';
 import { Preload, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
@@ -51,10 +51,11 @@ const preloadBrowserImage = (path) => {
 };
 
 const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '');
+const isBraveBrowser = typeof navigator !== 'undefined' && Boolean(navigator.brave);
 const isWeakCPU = typeof navigator.hardwareConcurrency !== 'undefined' && navigator.hardwareConcurrency <= 4;
 const isLowRAM = typeof navigator.deviceMemory !== 'undefined' && navigator.deviceMemory <= 4;
 const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 450;
-const isLowEnd = isMobileDevice || isWeakCPU || isLowRAM || isSmallScreen;
+const isLowEnd = isMobileDevice || isBraveBrowser || isWeakCPU || isLowRAM || isSmallScreen;
 
 const supportsHover = typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches;
 
@@ -91,6 +92,36 @@ const GlobalAudioEnabler = () => {
   return null;
 };
 
+const WebGLFallback = () => (
+  <div className="webgl-fallback" role="status">
+    <div className="webgl-fallback__door" aria-hidden="true">
+      <span>PORTFOLIO</span>
+      <div className="webgl-fallback__door-panel" />
+    </div>
+    <p>Restoring the 3D sketchbook…</p>
+    <button type="button" onClick={() => window.location.reload()}>
+      Reload scene
+    </button>
+  </div>
+);
+
+const CanvasHealthMonitor = ({ onContextLost }) => {
+  const { gl } = useThree();
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const handleContextLost = (event) => {
+      event.preventDefault();
+      onContextLost();
+    };
+
+    canvas.addEventListener('webglcontextlost', handleContextLost, false);
+    return () => canvas.removeEventListener('webglcontextlost', handleContextLost, false);
+  }, [gl, onContextLost]);
+
+  return null;
+};
+
 // Bridge component to handle dynamic meta tags + deep link auto-teleport
 function DocumentMetaBridge() {
   useDocumentMeta();
@@ -109,7 +140,10 @@ function DocumentMetaBridge() {
 function AppContent() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
-  const { settings } = usePerformance();
+  const [canvasKey, setCanvasKey] = useState(0);
+  const recoveryAttempts = useRef(0);
+  const recoveryTimer = useRef(null);
+  const { settings, downgradeTier } = usePerformance();
 
   useEffect(() => {
     initAudio();
@@ -121,6 +155,22 @@ function AppContent() {
     });
   }, []);
 
+  const handleContextLost = useCallback(() => {
+    if (recoveryAttempts.current >= 2 || recoveryTimer.current) return;
+
+    recoveryAttempts.current += 1;
+    downgradeTier();
+    recoveryTimer.current = window.setTimeout(() => {
+      setSceneReady(false);
+      setCanvasKey((current) => current + 1);
+      recoveryTimer.current = null;
+    }, 400);
+  }, [downgradeTier]);
+
+  useEffect(() => () => {
+    if (recoveryTimer.current) window.clearTimeout(recoveryTimer.current);
+  }, []);
+
   return (
     <AudioProvider>
       <SceneProvider>
@@ -130,6 +180,7 @@ function AppContent() {
           {/* Full screen 3D Canvas */}
           <div className="canvas-wrapper">
             <Canvas
+              key={canvasKey}
               camera={{
                 position: [0, 0.2, 28],
                 fov: 60,
@@ -139,17 +190,22 @@ function AppContent() {
               gl={{
                 antialias: settings.antialias,
                 alpha: false,
-                powerPreference: settings.powerPreference,
+                powerPreference: isBraveBrowser ? 'default' : settings.powerPreference,
                 localClippingEnabled: true,
-                failIfMajorPerformanceCaveat: true
+                // Brave can label a perfectly usable software/hybrid GPU as a
+                // performance caveat. Refusing that context leaves only the
+                // HTML overlay visible on an otherwise blank page.
+                failIfMajorPerformanceCaveat: false
               }}
-              dpr={settings.dpr}
+              dpr={isBraveBrowser ? [1, 1.25] : settings.dpr}
               shadows={settings.shadows}
+              fallback={<WebGLFallback />}
             >
               <color attach="background" args={['#fdf8e2']} /> {/* TINTED TO DEEP PURPLE */}
               <fog attach="fog" args={['#fdf8e2', 15, 50]} /> {/* FOG TINTED TO DEEP PURPLE */}
 
               <Suspense fallback={null}>
+                <CanvasHealthMonitor onContextLost={handleContextLost} />
                 <Experience onSceneReady={handleSceneReady} />
                 <Preload all />
               </Suspense>

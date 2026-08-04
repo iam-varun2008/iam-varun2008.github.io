@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 
 import InfiniteCorridorManager from './corridor/InfiniteCorridorManager';
@@ -27,7 +27,7 @@ const ENTRANCE_DOORS_Z = 22;
  */
 const Experience = ({ onSceneReady }) => {
     // Use SceneContext for room state
-    const { hasEntered, markEntered, enterRoom, isTeleporting, isInRoom, pendingDoorClick } = useScene();
+    const { hasEntered, markEntered, enterRoom, isTeleporting, isInRoom } = useScene();
 
     const { camera } = useThree();
 
@@ -59,12 +59,22 @@ const Experience = ({ onSceneReady }) => {
         // console.log('Entering:', doorId);
     }, [enterRoom]);
 
-    // The visible entrance is ready as soon as its first frame can render.
-    // Room shaders compile on demand instead of blocking the global loader.
-    useEffect(() => {
-        const readyFrame = requestAnimationFrame(() => onSceneReady?.());
-        return () => cancelAnimationFrame(readyFrame);
-    }, [onSceneReady]);
+    const sceneReadySent = useRef(false);
+
+    // Report readiness from the render loop, not from a DOM animation frame.
+    // A browser can schedule requestAnimationFrame even when its WebGL context
+    // failed, which previously let the loader reveal an empty canvas in Brave.
+    useFrame(({ gl, scene }) => {
+        const context = gl.getContext();
+        if (
+            !sceneReadySent.current &&
+            !context.isContextLost() &&
+            scene.children.length > 0
+        ) {
+            sceneReadySent.current = true;
+            onSceneReady?.();
+        }
+    });
 
     return (
         <>
