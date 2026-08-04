@@ -5,7 +5,6 @@ import InfiniteCorridorManager from './corridor/InfiniteCorridorManager';
 import EntranceDoors from './entrance/EntranceDoors';
 import EmptyCorridor from './entrance/EmptyCorridor';
 import TeleportRoom from './corridor/TeleportRoom';
-import RoomWarmup from './corridor/RoomWarmup';
 import useInfiniteCamera from '../../hooks/useInfiniteCamera';
 import SignSystem from './entrance/SignSystem';
 import { useScene } from '../../context/SceneContext';
@@ -26,7 +25,7 @@ const ENTRANCE_DOORS_Z = 22;
  * 2. Click doors -> they open + camera flies through
  * 3. Behind doors: infinite corridor with ITOM
  */
-const Experience = ({ isLoaded, onSceneReady, performanceTier }) => {
+const Experience = ({ onSceneReady }) => {
     // Use SceneContext for room state
     const { hasEntered, markEntered, enterRoom, isTeleporting, isInRoom, pendingDoorClick } = useScene();
 
@@ -60,21 +59,15 @@ const Experience = ({ isLoaded, onSceneReady, performanceTier }) => {
         // console.log('Entering:', doorId);
     }, [enterRoom]);
 
-    // Medium and low-tier devices skip the expensive all-room GPU warm-up.
-    // Rooms still compile normally when the visitor opens them.
-    const skipIntensiveWarmup = performanceTier !== 'HIGH';
+    // The visible entrance is ready as soon as its first frame can render.
+    // Room shaders compile on demand instead of blocking the global loader.
+    useEffect(() => {
+        const readyFrame = requestAnimationFrame(() => onSceneReady?.());
+        return () => cancelAnimationFrame(readyFrame);
+    }, [onSceneReady]);
 
     return (
         <>
-            {/* === ROOM WARM-UP (pre-renders all rooms off-screen during preloader) === */}
-            {/* RoomWarmup mounts all 4 rooms 500 units below, compiles shaders via gl.compile(), 
-                then self-destructs and signals onSceneReady. This ensures both corridor segments
-                AND room shaders are pre-compiled before the user starts interacting. */}
-            <RoomWarmup
-                onWarmupComplete={onSceneReady}
-                skipIntensiveWarmup={skipIntensiveWarmup}
-            />
-
             {/* === GLOBAL LIGHTING === */}
             {/* <ambientLight intensity={isLowTier ? 2.5 : 2.2} /> */}
             {/* <directionalLight

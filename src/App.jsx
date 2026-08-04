@@ -97,7 +97,7 @@ function DocumentMetaBridge() {
 function AppContent() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
-  const { settings, downgradeTier, tier } = usePerformance();
+  const { settings } = usePerformance();
 
   useEffect(() => {
     initAudio();
@@ -138,11 +138,7 @@ function AppContent() {
               <fog attach="fog" args={['#fdf8e2', 15, 50]} /> {/* FOG TINTED TO DEEP PURPLE */}
 
               <Suspense fallback={null}>
-                <Experience
-                  isLoaded={isLoaded}
-                  onSceneReady={handleSceneReady}
-                  performanceTier={tier}
-                />
+                <Experience onSceneReady={handleSceneReady} />
                 <Preload all />
               </Suspense>
             </Canvas>

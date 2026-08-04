@@ -182,6 +182,33 @@ const Preloader = ({ onComplete, ready }) => {
 
   useEffect(() => { readyRef.current = ready; }, [ready]);
 
+  // Brave and privacy-focused browsers can occasionally suppress an optional
+  // scene-ready signal even after every managed asset has loaded. Once the
+  // loading manager is inactive, never leave the visitor parked at 90%.
+  useEffect(() => {
+    if (active || ready) return undefined;
+
+    const completionTimer = window.setTimeout(() => {
+      readyRef.current = true;
+      setTargetProgress(100);
+    }, 1200);
+
+    return () => window.clearTimeout(completionTimer);
+  }, [active, ready]);
+
+  // Last-resort protection for a browser extension or blocked optional asset.
+  // The entrance can render without waiting forever for nonessential preloads.
+  useEffect(() => {
+    const hardLimitTimer = window.setTimeout(() => {
+      readyRef.current = true;
+      setActive(false);
+      setRealProgress(100);
+      setTargetProgress(100);
+    }, 20000);
+
+    return () => window.clearTimeout(hardLimitTimer);
+  }, []);
+
   // ----------------------------------------
   // GENERATE TEAR PATH
   // ----------------------------------------
