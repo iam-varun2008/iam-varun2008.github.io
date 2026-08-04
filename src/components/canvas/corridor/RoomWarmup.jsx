@@ -1,7 +1,6 @@
-import { useRef, useState, Suspense } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 
-// Eagerly import all room components
 import GalleryRoom from '../rooms/Gallery/GalleryRoom';
 import StudioRoom from '../rooms/Studio/StudioRoom';
 import AboutRoom from '../rooms/About/AboutRoom';
@@ -9,83 +8,78 @@ import ContactRoom from '../rooms/Contact/ContactRoom';
 import { isSanityDataLoaded } from '../../../hooks/useSanityData';
 
 /**
- * RoomWarmup Component
- * 
- * Mounts all 4 rooms off-screen during the preloader phase to force
- * shader compilation and texture upload to GPU. After a few frames,
- * it unmounts the rooms to free memory. This ensures the first room
- * entry has zero shader compilation stutter.
- * 
- * Positioned 500 units below the scene so nothing is visible.
- * Audio components won't be audible at this distance.
+ * Pre-renders the rooms off-screen so their shaders are ready before the
+ * visitor opens a door. This is only an optimization and must never block the
+ * entrance experience.
  */
-const RoomWarmup = ({ onWarmupComplete, isLowTier }) => {
+const RoomWarmup = ({ onWarmupComplete, skipIntensiveWarmup }) => {
     const [isDone, setIsDone] = useState(false);
     const frameCount = useRef(0);
+    const compilationStarted = useRef(false);
     const completeFired = useRef(false);
     const { gl, scene, camera } = useThree();
 
-    // Wait for rooms to render a few frames, then compile and unmount
-    const warmupStart = useRef(performance.now());
+    const finishWarmup = useCallback(() => {
+        if (completeFired.current) return;
+        completeFired.current = true;
+
+        requestAnimationFrame(() => {
+            setIsDone(true);
+            onWarmupComplete?.();
+        });
+    }, [onWarmupComplete]);
+
+    // Some browser/GPU combinations leave compileAsync pending indefinitely.
+    // The visitor should always be allowed through even if GPU warm-up fails.
+    useEffect(() => {
+        const fallbackTimer = window.setTimeout(finishWarmup, 8000);
+        return () => window.clearTimeout(fallbackTimer);
+    }, [finishWarmup]);
 
     useFrame(() => {
-        if (isDone || completeFired.current) return;
-
-        // Wait until Sanity data is loaded before starting warmup
+        if (isDone || completeFired.current || compilationStarted.current) return;
         if (!isSanityDataLoaded()) return;
 
-        frameCount.current++;
+        frameCount.current += 1;
+        const targetFrames = skipIntensiveWarmup ? 1 : 3;
 
-        // For low tier, we skip warmup, but still wait 1 frame for entrance to mount
-        const targetFrames = isLowTier ? 1 : 3;
+        if (frameCount.current < targetFrames) return;
+        compilationStarted.current = true;
 
-        if (frameCount.current >= targetFrames) {
-            completeFired.current = true;
+        // Medium and low-tier devices compile each room normally when opened.
+        if (skipIntensiveWarmup) {
+            finishWarmup();
+            return;
+        }
 
-            const finishWarmup = () => {
-                const warmupDuration = ((performance.now() - warmupStart.current) / 1000).toFixed(2);
-                // console.info(`🔥 GPU/Shader Warmup Complete: ${warmupDuration}s ${isLowTier ? '(Bypassed for LOW tier)' : ''}`);
-                
-                requestAnimationFrame(() => {
-                    setIsDone(true);
-                    onWarmupComplete?.();
-                });
-            };
-
-            // On low tier, bypass intense gl.compileAsync to save memory and avoid Context Lost
-            if (isLowTier) {
-                finishWarmup();
-                return;
-            }
-
-            // Force compile all shaders in the scene (including warm-up rooms)
-            // Use 2026 compileAsync to avoid blocking the main thread!
-            if (gl.compileAsync) {
-                gl.compileAsync(scene, camera, scene)
-                    .then(finishWarmup)
-                    .catch((err) => {
-                        console.error('Async compilation failed, falling back to sync', err);
-                        gl.compile(scene, camera);
-                        finishWarmup();
-                    });
-            } else {
+        const compileSynchronously = () => {
+            try {
                 gl.compile(scene, camera);
+            } catch (error) {
+                console.warn('Room shader warm-up was skipped', error);
+            } finally {
                 finishWarmup();
             }
+        };
+
+        if (gl.compileAsync) {
+            gl.compileAsync(scene, camera, scene)
+                .then(finishWarmup)
+                .catch((error) => {
+                    console.warn('Async room shader warm-up failed', error);
+                    compileSynchronously();
+                });
+        } else {
+            compileSynchronously();
         }
     });
 
-    if (isDone) return null;
+    if (isDone || skipIntensiveWarmup) return null;
 
-    // Do not mount rooms at all on low end devices to prevent WebGL Context Lost
-    if (isLowTier) return null;
-
-    // Dummy handlers to prevent errors (rooms expect these props)
     const noop = () => {};
 
     return (
         <group position={[0, -500, 0]}>
-            {/* Mount all rooms in Suspense - positioned far below camera */}
             <Suspense fallback={null}>
                 <group position={[-20, 0, 0]}>
                     <GalleryRoom showRoom={true} onReady={noop} isExiting={false} isWarmup={true} />
