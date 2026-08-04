@@ -31,11 +31,23 @@ import {
 } from './config/texturePreloadList';
 import { TextureLoader } from 'three';
 
+// Public-folder textures keep stable filenames between deployments. Attach a
+// release version so privacy-focused browsers do not reuse a cached 404 from a
+// previous GitHub Pages publish while the CDN was still propagating assets.
+const ASSET_CACHE_VERSION = '20260804-brave-loader-1';
+const versionAssetUrl = (url) => {
+  if (!/^\/(textures|images|projects|certificates|audio)\//.test(url)) return url;
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}v=${ASSET_CACHE_VERSION}`;
+};
+
+THREE.DefaultLoadingManager.setURLModifier(versionAssetUrl);
+
 // Standard Browser-level Image Preloader (for <img> tags)
 const preloadBrowserImage = (path) => {
   if (typeof window === 'undefined') return;
   const img = new Image();
-  img.src = path;
+  img.src = versionAssetUrl(path);
 };
 
 const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '');
