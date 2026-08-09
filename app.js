@@ -147,8 +147,11 @@ function playIntro() {
   }
 
   const loaderName = loaderWord.textContent.trim();
+  const heroName = heroWord.textContent.trim();
   loaderWord.setAttribute("aria-label", loaderName);
+  heroWord.setAttribute("aria-label", heroName);
   loaderWord.innerHTML = [...loaderName].map(letter => `<span class="loader-letter" aria-hidden="true">${letter}</span>`).join("");
+  heroWord.innerHTML = [...heroName].map(letter => `<span class="hero-letter" aria-hidden="true">${letter}</span>`).join("");
   const loaderLetters = qsa(".loader-letter", loaderWord);
 
   gsap.set(loader, { autoAlpha: 1, yPercent: 0 });
@@ -181,6 +184,7 @@ function playIntro() {
 
   intro
     .to(loaderLetters, { x: 0, autoAlpha: 1, filter:"blur(0px)", duration: .86, stagger:.075, ease: "power3.inOut" }, .2)
+    .set(loaderLetters, { clearProps:"transform,filter,opacity" }, 1.34)
     .set(heroWord, { x: 0, autoAlpha: 1 }, 1.4)
     .to(loader, { autoAlpha: 0, duration: .2, ease: "power1.out" }, 1.4)
     .to(photo, { yPercent: 0, scale: 1, filter: "blur(0px)", autoAlpha: 1, duration: 1.1, ease: "power2.out" }, 1.4)
