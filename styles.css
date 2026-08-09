@@ -52,6 +52,7 @@ img { display: block; max-width: 100%; }
 
 .loader { position: fixed; inset: 0; z-index: 1000; background: var(--stone); display: grid; place-items: center; will-change:transform; }
 .loader-word { position:absolute; left:1.5vw; top:1.5vw; transform:translate3d(24vw,0,0); opacity:0; font-family:"TR3A",Arial,sans-serif; font-size:27vw; font-weight:700; letter-spacing:-.09em; line-height:.73; color:var(--yellow); white-space:nowrap; will-change:transform,opacity; }
+.loader-letter { display:inline-block; will-change:transform,filter,opacity; }
 .loader-line { position: absolute; bottom: 5vh; left: 2vw; right: 2vw; height: 2px; background: rgba(0,0,0,.12); overflow: hidden; }
 .loader-line { display:none; }
 .loader-line span { display:block; width: 100%; height:100%; background:#000; transform:scaleX(0); transform-origin:left; will-change:transform; }
@@ -222,8 +223,9 @@ main { width:100%; }
 .journey-inner { position:relative; }
 .journey h2 { margin:0; font-size:clamp(76px,8.8vw,124px); line-height:.82; letter-spacing:-.075em; font-weight:650; }
 .journey h2 span { color:rgba(255,255,255,.85); }
-.journey h2 > .journey-line { display:block; overflow:hidden; color:var(--ink); white-space:nowrap; }
-.journey h2 > .journey-line > span { color:rgba(255,255,255,.85); }
+.journey h2 > .journey-line-mask { display:block; overflow:hidden; color:var(--ink); white-space:nowrap; }
+.journey h2 .journey-line { display:block; color:var(--ink); }
+.journey h2 .journey-line > span { color:rgba(255,255,255,.85); }
 .journey > .content-shell > p,.journey-inner > p { max-width:460px; margin:44px 0 0; font-size:16px; line-height:1.5; }
 .talk-orbit { position:absolute; right:11%; top:48%; display:grid; grid-template-columns:34px auto; gap:7px; align-items:center; text-align:center; transition:transform .35s; }
 .talk-orbit::before { content:"NP"; width:32px; height:32px; border-radius:50%; display:grid; place-items:center; background:#3a3732; color:var(--yellow); font-size:9px; font-weight:900; }
@@ -528,8 +530,8 @@ main { width:100%; }
 
   .journey { height:132.83vh; min-height:0; padding-top:10vw; }
   .journey h2 { width:50vw; margin-left:11.7vw; font-size:7.09vw; line-height:1; font-weight:500; letter-spacing:-.032em; }
-  .journey h2 > .journey-line { display:block; overflow:hidden; color:var(--ink); white-space:nowrap; }
-  .journey h2 > .journey-line > span { color:rgba(255,255,255,.85); }
+  .journey h2 > .journey-line-mask { display:block; overflow:hidden; color:var(--ink); white-space:nowrap; }
+  .journey h2 .journey-line > span { color:rgba(255,255,255,.85); }
   .journey-inner > p { max-width:24vw; margin:2.29vw 0 0 11.7vw; font-size:1.18vw; line-height:1.6; }
   .talk-orbit { right:8%; top:48%; }
 
@@ -646,10 +648,11 @@ a.contact-card:hover { transform:translateX(7px); background:var(--yellow); }
 .contact-form button:hover { transform:translateY(-3px); }
 .contact-form small { text-align:center; font-size:9px; color:rgba(0,0,0,.55); }
 
-.roll-line-mask { perspective:900px; }
+.roll-line-mask,.journey-line-mask { display:block; overflow:hidden; perspective:900px; padding-bottom:.07em; margin-bottom:-.07em; }
 .roll-line,.journey-line { transform-origin:left bottom; will-change:transform,filter,opacity; }
 .journey h2 { overflow:visible; }
 .journey-line { display:block; }
+.text-word { display:inline-block; will-change:transform,filter,opacity; }
 .timeline-card,.project-card,.art-card,.goal-card,.contact-card { perspective:900px; }
 .timeline-card > *,.project-card > *,.art-card > *,.goal-card > *,.contact-card > * { will-change:transform; }
 
@@ -665,7 +668,8 @@ a.contact-card:hover { transform:translateX(7px); background:var(--yellow); }
 @keyframes buttonBreathe { 0%,100% { box-shadow:0 0 0 rgba(255,255,0,0); } 50% { box-shadow:0 10px 28px rgba(255,255,0,.24); } }
 
 html[lang="ko"] body,html[lang="ko"] button,html[lang="ko"] input,html[lang="ko"] textarea { font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif; word-break:keep-all; }
-html[lang="ko"] h1,html[lang="ko"] h2,html[lang="ko"] h3,html[lang="ko"] .hero-button,html[lang="ko"] .hero-title,html[lang="ko"] .stat-card,html[lang="ko"] .traits-card,html[lang="ko"] .brand-chip,html[lang="ko"] .book-button,html[lang="ko"] .side-nav { font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif; }
+html[lang="ko"] h1,html[lang="ko"] h2,html[lang="ko"] h3,html[lang="ko"] .hero-button,html[lang="ko"] .hero-title,html[lang="ko"] .stat-card,html[lang="ko"] .traits-card,html[lang="ko"] .brand-chip,html[lang="ko"] .book-button,html[lang="ko"] .side-nav,html[lang="ko"] .hero-word,html[lang="ko"] .loader-word,html[lang="ko"] .footer-word { font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif; }
+html[lang="ko"] .hero-word,html[lang="ko"] .loader-word { font-size:25vw; letter-spacing:-.11em; }
 html[lang="ko"] .hero-title h1 { font-size:clamp(46px,4.7vw,66px); line-height:.98; letter-spacing:-.065em; }
 html[lang="ko"] .timeline-card .year { font-size:clamp(48px,5.1vw,75px); letter-spacing:-.085em; }
 html[lang="ko"] .journey h2 { font-size:clamp(60px,7.4vw,106px); line-height:.92; letter-spacing:-.08em; }

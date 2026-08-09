@@ -17,7 +17,7 @@ qsa("[data-word-reveal]").forEach(element => {
 
 const journeyHeading = qs(".journey h2");
 if (journeyHeading) {
-  journeyHeading.innerHTML = journeyHeading.innerHTML.split(/<br\s*\/?>/i).map(line => `<span class="journey-line">${line}</span>`).join("");
+  journeyHeading.innerHTML = journeyHeading.innerHTML.split(/<br\s*\/?>/i).map(line => `<span class="journey-line-mask"><span class="journey-line">${line}</span></span>`).join("");
 }
 
 function prepareRollingLines(element) {
@@ -28,7 +28,18 @@ function prepareRollingLines(element) {
   element.innerHTML = lines.map(line => `<span class="roll-line-mask"><span class="roll-line" aria-hidden="true">${line.trim()}</span></span>`).join("");
 }
 
-qsa(".about .section-heading h2,.work-intro h2,.services .section-heading h2,.testimonials .section-heading h2,.contact .section-heading h2,.timeline-card h3").forEach(prepareRollingLines);
+qsa(".about .section-heading h2,.work-intro h2,.services .section-heading h2,.testimonials .section-heading h2,.contact .section-heading h2,.timeline-card h3,.art-caption h3,.goal-card h3").forEach(prepareRollingLines);
+
+function prepareTextReveal(element) {
+  if (!element || element.dataset.textRevealReady) return;
+  const text = element.textContent.trim();
+  if (!text) return;
+  element.dataset.textRevealReady = "true";
+  element.setAttribute("aria-label", text.replace(/\s+/g, " "));
+  element.innerHTML = text.split(/\s+/).map(word => `<span class="text-word" aria-hidden="true">${word}</span>`).join(" ");
+}
+
+qsa(".about .section-heading > p,.timeline-card > p,.work-intro > p,.project-info p,.journey-inner > p,.services .section-heading > p,.art-caption p,.testimonials .section-heading > p,.goal-card > p,.goal-card footer small,.contact .section-heading > p,.contact-card strong,.contact-card b,.contact-form label > span,.contact-form > small").forEach(prepareTextReveal);
 
 qsa(".mega-title > span").forEach(line => {
   line.classList.add("roll-line-mask");
@@ -135,8 +146,14 @@ function playIntro() {
     return;
   }
 
+  const loaderName = loaderWord.textContent.trim();
+  loaderWord.setAttribute("aria-label", loaderName);
+  loaderWord.innerHTML = [...loaderName].map(letter => `<span class="loader-letter" aria-hidden="true">${letter}</span>`).join("");
+  const loaderLetters = qsa(".loader-letter", loaderWord);
+
   gsap.set(loader, { autoAlpha: 1, yPercent: 0 });
-  gsap.set(loaderWord, { x: "100vw", y: 0, yPercent: 0, scale: 1, autoAlpha: 0 });
+  gsap.set(loaderWord, { x: 0, y: 0, yPercent: 0, scale: 1, autoAlpha: 1 });
+  gsap.set(loaderLetters, { x: "105vw", autoAlpha: 0, filter:"blur(8px)" });
   gsap.set(heroWord, { x: "9vw", y: 0, scale: 1, autoAlpha: 0 });
   gsap.set(photo, { xPercent: innerWidth <= 900 ? -50 : 0, yPercent: 14, scale: .88, filter: "blur(20px)", autoAlpha: 0 });
   gsap.set(title, { y: 24, scale: .9, filter: "blur(10px)", autoAlpha: 0 });
@@ -163,7 +180,7 @@ function playIntro() {
   });
 
   intro
-    .to(loaderWord, { x: 0, autoAlpha: 1, duration: 1, ease: "power3.inOut" }, .2)
+    .to(loaderLetters, { x: 0, autoAlpha: 1, filter:"blur(0px)", duration: .86, stagger:.075, ease: "power3.inOut" }, .2)
     .set(heroWord, { x: 0, autoAlpha: 1 }, 1.4)
     .to(loader, { autoAlpha: 0, duration: .2, ease: "power1.out" }, 1.4)
     .to(photo, { yPercent: 0, scale: 1, filter: "blur(0px)", autoAlpha: 1, duration: 1.1, ease: "power2.out" }, 1.4)
@@ -333,11 +350,11 @@ function createMotionScenes() {
   }
 
   const rollingTitles = [
-    { heading:qs(".about .section-heading h2"), trigger:qs(".about"), start:"top 90%", extras:qsa(".about .section-heading > :not(h2)") },
-    { heading:qs(".work-intro h2"), trigger:qs(".work-sticky"), start:"top 80%", extras:qsa(".work-intro .eyebrow,.work-intro > p") },
-    { heading:qs(".services .section-heading h2"), trigger:qs(".services .section-heading"), start:"top 60%", end:"top 34%", scrub:.42, extras:qsa(".services .section-heading > :not(h2)") },
-    { heading:qs(".testimonials .section-heading h2"), trigger:qs(".testimonials .section-heading"), start:"top 92%", end:"top 54%", scrub:.48, extras:qsa(".testimonials .section-heading > :not(h2)") },
-    { heading:qs(".contact .section-heading h2"), trigger:qs(".contact .section-heading"), start:"top 92%", end:"top 54%", scrub:.48, extras:qsa(".contact .section-heading > :not(h2)") }
+    { heading:qs(".about .section-heading h2"), trigger:qs(".about"), start:"top 90%", extras:qsa(".about .section-heading > .eyebrow") },
+    { heading:qs(".work-intro h2"), trigger:qs(".work-sticky"), start:"top 80%", extras:qsa(".work-intro .eyebrow") },
+    { heading:qs(".services .section-heading h2"), trigger:qs(".services .section-heading"), start:"top 60%", end:"top 34%", scrub:.36, extras:qsa(".services .section-heading > .eyebrow") },
+    { heading:qs(".testimonials .section-heading h2"), trigger:qs(".testimonials .section-heading"), start:"top 96%", end:"top 64%", scrub:.36, extras:qsa(".testimonials .section-heading > .eyebrow") },
+    { heading:qs(".contact .section-heading h2"), trigger:qs(".contact .section-heading"), start:"top 96%", end:"top 64%", scrub:.36, extras:qsa(".contact .section-heading > .eyebrow") }
   ];
 
   rollingTitles.forEach(({ heading, trigger, start, end, scrub, extras }) => {
@@ -360,6 +377,35 @@ function createMotionScenes() {
       delay:.35,
       ease:"power2.out",
       scrollTrigger:{ trigger, start, once:true }
+    });
+  });
+
+  qsa(".art-card,.goal-card").forEach(card => {
+    const lines = qsa(".roll-line", card);
+    if (!lines.length) return;
+    gsap.fromTo(lines, { yPercent:118, rotate:3, autoAlpha:0, filter:"blur(5px)" }, {
+      yPercent:0,
+      rotate:0,
+      autoAlpha:1,
+      filter:"blur(0px)",
+      duration:.72,
+      stagger:.08,
+      ease:"expo.out",
+      scrollTrigger:{ trigger:card, start:"top 82%", once:true }
+    });
+  });
+
+  qsa("[data-text-reveal-ready]").forEach(block => {
+    const words = qsa(".text-word", block);
+    if (!words.length) return;
+    gsap.fromTo(words, { yPercent:85, autoAlpha:0, filter:"blur(4px)" }, {
+      yPercent:0,
+      autoAlpha:1,
+      filter:"blur(0px)",
+      duration:.58,
+      stagger:.018,
+      ease:"power3.out",
+      scrollTrigger:{ trigger:block, start:"top 82%", once:true }
     });
   });
 

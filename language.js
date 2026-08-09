@@ -39,14 +39,17 @@
   function applyKorean() {
     const nav = ["홈", "소개", "프로젝트", "아트", "목표", "연락처"];
     document.documentElement.lang = "ko";
-    document.title = "사이버보안 포트폴리오 — VARUN®";
-    setAttribute('meta[name="description"]', "content", "사이버보안 학습자이자 Python 개발자, 흑연 드로잉 작가인 VARUN의 포트폴리오입니다.");
+    document.title = "사이버보안 포트폴리오 — 바룬®";
+    setAttribute('meta[name="description"]', "content", "사이버보안 학습자이자 Python 개발자, 흑연 드로잉 작가인 바룬의 포트폴리오입니다.");
+    setHtml(".language-mark,.brand-chip", "바룬<sup>®</sup>");
+    setText(".hero-word,.loader-word", "바룬");
+    setHtml(".footer-word", "바룬<sup>®</sup>");
     setText(".cursor span", "보기");
     setText(".mobile-header .call-chip", "문의하기");
     setAttribute(".menu-button", "aria-label", "메뉴 열기");
     setAttribute(".sidebar", "aria-label", "포트폴리오 내비게이션");
-    setAttribute(".socials a:first-child", "aria-label", "VARUN의 GitHub");
-    setAttribute(".socials a:last-child", "aria-label", "VARUN에게 이메일 보내기");
+    setAttribute(".socials a:first-child", "aria-label", "바룬의 GitHub");
+    setAttribute(".socials a:last-child", "aria-label", "바룬에게 이메일 보내기");
     setText(".side-intro > p", "실용적인 Python 도구를 만들고 윤리적 보안을 배우며 흑연 드로잉에서 영감을 받은 작업을 하는 사이버보안 학습자입니다.");
     setHtml(".side-projects-target span", "<b>보안</b> 프로젝트");
     setHtml(".side-years-target span", "인증된<br />수료증");
@@ -57,8 +60,8 @@
     setAttribute(".client-strip", "aria-label", "기술: Python, Linux, 보안, 아트");
     setText(".book-button", "문의하기");
 
-    setHtml(".hero-kicker", "보안을 만드는 사람.<br />바로 VARUN입니다.");
-    setAttribute(".hero-photo", "alt", "VARUN");
+    setHtml(".hero-kicker", "보안을 만드는 사람.<br />바로 바룬입니다.");
+    setAttribute(".hero-photo", "alt", "바룬");
     setHtml(".hero-title h1", "<span>보안을,</span><span>실전에</span><span>적용하다.</span>");
     setText(".hero-actions a:first-child", "문의하기");
     setText(".hero-actions a:last-child", "소개 보기");
@@ -103,7 +106,7 @@
     setText(".project-card:nth-child(1) .project-info p", "Apache 형식의 로그를 구문 분석해 로그인 실패, 관리자 접근, 404 오류, 요청 수, 의심스러운 활동을 보고합니다.");
     setText(".project-card:nth-child(2) .project-info h3", "포트 취약점 스캐너");
     setText(".project-card:nth-child(2) .project-info p", "허가된 대상의 포트를 스캔하고 노출된 서비스를 식별하며, 기본 위험을 분석해 실행 가능한 권고 사항을 생성합니다.");
-    setText(".project-card:nth-child(3) .project-info h3", "VARUN 포트폴리오");
+    setText(".project-card:nth-child(3) .project-info h3", "바룬 포트폴리오");
     setText(".project-card:nth-child(3) .project-info p", "사이버보안 프로젝트, 학업 성과, 수료증, 목표, 예술 작업을 모션 중심으로 구성한 개인 포트폴리오입니다.");
     setText(".project-card:nth-child(1) .project-actions a:first-child,.project-card:nth-child(2) .project-actions a:first-child", "데모 ↗");
     setText(".project-card:nth-child(3) .project-actions a:first-child", "라이브 ↗");
@@ -115,7 +118,7 @@
     setAttribute('.project-card:nth-child(2) img:nth-child(2)', 'alt', '스캐너 대상 입력 화면');
     setAttribute('.project-card:nth-child(2) img:nth-child(3)', 'alt', '포트 취약점 보고서');
     setAttribute('.project-card:nth-child(2) img:nth-child(4)', 'alt', '저장된 포트 스캔 보고서');
-    setAttribute('.project-card:nth-child(3) img', 'alt', 'VARUN 포트폴리오 메인 화면');
+    setAttribute('.project-card:nth-child(3) img', 'alt', '바룬 포트폴리오 메인 화면');
 
     setHtml(".journey h2", "깊이 배우고<br />명확하게 만들며<br /><span>윤리적으로 시험하고</span><br /><span>계속 성장합니다</span>");
     setText(".journey-inner > p", "방향은 분명합니다. 기초를 탄탄히 익히고, 유용한 방어형 도구를 만들며, 허가된 환경에서만 실습하고, 모든 프로젝트를 성장의 증거로 남기겠습니다.");
@@ -172,7 +175,7 @@
 
   function loadPortfolio() {
     const script = document.createElement("script");
-    script.src = "app.js?v=20260809-bilingual7";
+    script.src = "app.js?v=20260809-letterintro9";
     script.onload = () => {
       document.body.classList.remove("language-pending");
       qs(".language-gate")?.remove();
