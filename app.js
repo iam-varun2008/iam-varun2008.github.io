@@ -1,6 +1,10 @@
 const qs = (selector, scope = document) => scope.querySelector(selector);
 const qsa = (selector, scope = document) => [...scope.querySelectorAll(selector)];
 
+// Keep the replaced timeline as source reference only; it must not participate
+// in live loading, layout, or scroll-animation measurements.
+qs(".timeline[hidden]")?.remove();
+
 history.scrollRestoration = "manual";
 window.scrollTo(0, 0);
 document.body.classList.add("is-loading");
@@ -12,16 +16,6 @@ let lenis = null;
 qsa("[data-word-reveal]").forEach(element => {
   const words = element.textContent.trim().split(/\s+/);
   element.innerHTML = words.map(word => `<span class="word">${word}</span>`).join(" ");
-});
-
-const projectArrowSvg = `<span class="project-arrow" aria-hidden="true"><svg viewBox="0 0 23 23"><rect x="15.4004" y="5.5" width="2" height="15" rx="1" transform="rotate(45 15.4004 5.5)" fill="currentColor"/><rect x="14.8145" y="5.5" width="2" height="11" rx="1" fill="currentColor"/><rect x="16.8145" y="5.5" width="2" height="11" rx="1" transform="rotate(90 16.8145 5.5)" fill="currentColor"/></svg></span>`;
-const projectForegrounds = [
-  "https://cdn.prod.website-files.com/691d7c9f14d0280ebe2d4108/6a426dc8bd343b5a6bd033a6_1910%20-%20Transparent.avif",
-  "https://cdn.prod.website-files.com/691d7c9f14d0280ebe2d4108/6a426dc80e9268be5e6f17f2_SemiconBio%20-%20Transparent.avif"
-];
-qsa(".project-card").forEach((card, index) => {
-  if (projectForegrounds[index]) card.querySelector("img")?.insertAdjacentHTML("afterend", `<img class="project-fg" src="${projectForegrounds[index]}" alt="" aria-hidden="true" />`);
-  card.insertAdjacentHTML("beforeend", projectArrowSvg);
 });
 
 const journeyHeading = qs(".journey h2");
@@ -260,7 +254,7 @@ function createMotionScenes() {
     }
   });
 
-  const timelinePath = qs(".timeline-path");
+  const timelinePath = qs(".timeline:not([hidden]) .timeline-path");
   if (timelinePath) {
     gsap.fromTo(timelinePath, { clipPath:"inset(0 0 100% 0)" }, {
       clipPath:"inset(0 0 0% 0)",
@@ -269,9 +263,9 @@ function createMotionScenes() {
     });
   }
 
-  const timelineDots = qsa(".timeline-dots circle");
+  const timelineDots = qsa(".timeline:not([hidden]) .timeline-dots circle");
   gsap.set(timelineDots, { scale:0, autoAlpha:0 });
-  qsa(".timeline-card").forEach((card, index) => {
+  qsa(".timeline:not([hidden]) .timeline-card").forEach((card, index) => {
     gsap.fromTo(card,
       { yPercent:15, scale:.65, autoAlpha:0 },
       { yPercent:0, scale:1, autoAlpha:1, ease:"none", scrollTrigger:{ trigger:card, start:"top 102%", end:"top 84%", scrub:.55 } }
@@ -370,7 +364,7 @@ function createMotionScenes() {
     scrollTrigger:{ trigger:".testimonial-track", start:"top 88%", once:true }
   });
 
-  gsap.fromTo(".faq-grid details", { y:30, autoAlpha:0 }, {
+  gsap.fromTo(".contact-card,.contact-form", { y:30, autoAlpha:0 }, {
     y:0, autoAlpha:1, stagger:.055, duration:.65, ease:"power3.out",
     scrollTrigger:{ trigger:".faq-grid", start:"top 88%", once:true }
   });
@@ -428,7 +422,7 @@ qs(".email-copy")?.addEventListener("click", async event => {
     await navigator.clipboard.writeText(event.currentTarget.dataset.copy);
     toast.textContent = "Email copied";
   } catch {
-    toast.textContent = "nenad@popadic.co";
+    toast.textContent = "2008.varunreddy@gmail.com";
   }
   toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), 1600);
@@ -478,6 +472,17 @@ qsa(".faq details").forEach(detail => detail.addEventListener("toggle", () => {
   if (!detail.open) return;
   qsa(".faq details").forEach(other => { if (other !== detail) other.open = false; });
 }));
+
+qs("#contact-form")?.addEventListener("submit", event => {
+  event.preventDefault();
+  const data = new FormData(event.currentTarget);
+  const name = String(data.get("name") || "").trim();
+  const email = String(data.get("email") || "").trim();
+  const message = String(data.get("message") || "").trim();
+  const subject = encodeURIComponent(`Portfolio message from ${name}`);
+  const body = encodeURIComponent(`${message}\n\nFrom: ${name}\nEmail: ${email}`);
+  window.location.href = `mailto:2008.varunreddy@gmail.com?subject=${subject}&body=${body}`;
+});
 
 const begin = () => document.fonts.ready.then(playIntro);
 if (document.readyState === "complete") begin();

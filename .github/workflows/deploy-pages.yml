@@ -31,7 +31,7 @@ jobs:
           mkdir -p dist/assets dist/fonts
           cp index.html styles.css app.js dist/
           cp motion-core.min.js motion-scroll.min.js smooth-scroll.min.js dist/
-          cp assets/varun-hero-original-v2.png dist/assets/
+          cp -R assets/. dist/assets/
           cp fonts/*.woff2 dist/fonts/
           touch dist/.nojekyll
 
