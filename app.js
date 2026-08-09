@@ -1,10 +1,6 @@
 const qs = (selector, scope = document) => scope.querySelector(selector);
 const qsa = (selector, scope = document) => [...scope.querySelectorAll(selector)];
 
-// Keep the replaced timeline as source reference only; it must not participate
-// in live loading, layout, or scroll-animation measurements.
-qs(".timeline[hidden]")?.remove();
-
 history.scrollRestoration = "manual";
 window.scrollTo(0, 0);
 document.body.classList.add("is-loading");
@@ -31,7 +27,7 @@ function prepareRollingLines(element) {
   element.innerHTML = lines.map(line => `<span class="roll-line-mask"><span class="roll-line" aria-hidden="true">${line.trim()}</span></span>`).join("");
 }
 
-qsa(".about .section-heading h2,.work-intro h2,.services .section-heading h2,.testimonials .section-heading h2,.timeline-card h3").forEach(prepareRollingLines);
+qsa(".about .section-heading h2,.work-intro h2,.services .section-heading h2,.testimonials .section-heading h2,.contact .section-heading h2,.timeline-card h3").forEach(prepareRollingLines);
 
 qsa(".mega-title > span").forEach(line => {
   line.classList.add("roll-line-mask");
@@ -288,28 +284,34 @@ function createMotionScenes() {
     );
   });
 
-  gsap.fromTo(".mega-roll-line", { yPercent: 105 }, {
-    yPercent: 0,
-    stagger: .12,
-    ease: "none",
-    scrollTrigger: { trigger: ".overview", start: "top 84%", end: "top 34%", scrub: .62 }
-  });
+  const megaLines = qsa(".mega-roll-line");
+  if (megaLines.length) {
+    gsap.fromTo(megaLines, { yPercent: 105 }, {
+      yPercent: 0,
+      stagger: .12,
+      ease: "none",
+      scrollTrigger: { trigger: ".overview", start: "top 84%", end: "top 34%", scrub: .62 }
+    });
+  }
 
   const rollingTitles = [
     { heading:qs(".about .section-heading h2"), trigger:qs(".about"), start:"top 90%", extras:qsa(".about .section-heading > :not(h2)") },
     { heading:qs(".work-intro h2"), trigger:qs(".work-sticky"), start:"top 80%", extras:qsa(".work-intro .eyebrow,.work-intro > p") },
     { heading:qs(".services .section-heading h2"), trigger:qs(".services .section-heading"), start:"top 90%", extras:qsa(".services .section-heading > :not(h2)") },
-    { heading:qs(".testimonials .section-heading h2"), trigger:qs(".testimonials .section-heading"), start:"top 90%", extras:qsa(".testimonials .section-heading > :not(h2)") }
+    { heading:qs(".testimonials .section-heading h2"), trigger:qs(".testimonials .section-heading"), start:"top 90%", extras:qsa(".testimonials .section-heading > :not(h2)") },
+    { heading:qs(".contact .section-heading h2"), trigger:qs(".contact .section-heading"), start:"top 90%", extras:qsa(".contact .section-heading > :not(h2)") }
   ];
 
   rollingTitles.forEach(({ heading, trigger, start, extras }) => {
     if (!heading || !trigger) return;
-    gsap.fromTo(qsa(".roll-line", heading), { yPercent:100 }, {
+    gsap.fromTo(qsa(".roll-line", heading), { yPercent:110, rotate:3, filter:"blur(3px)" }, {
       yPercent:0,
-      duration:.6,
+      rotate:0,
+      filter:"blur(0px)",
+      duration:.78,
       stagger:.1,
-      delay:.3,
-      ease:"power2.out",
+      delay:.22,
+      ease:"expo.out",
       scrollTrigger:{ trigger, start, once:true }
     });
     gsap.fromTo(extras, { y:18, autoAlpha:0 }, {

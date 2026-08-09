@@ -554,8 +554,15 @@ main { width:100%; }
 .certificate-card p { margin:0 0 24px; font-size:13px; color:rgba(0,0,0,.6); }
 .certificate-card b { padding-top:16px; border-top:1px solid rgba(0,0,0,.14); font-size:12px; }
 
+.academic-score { display:block; margin-top:20px; color:var(--yellow); font:700 58px/.82 "TR3A",Arial,sans-serif; letter-spacing:-.055em; }
+.academic-score small { font-size:18px; letter-spacing:-.01em; }
+.certificate-link { margin-left:auto; border-radius:8px; padding:11px 15px; background:var(--yellow); color:#000; font-size:12px; font-weight:900; white-space:nowrap; transition:transform .3s cubic-bezier(.16,1,.3,1),background .25s; }
+.certificate-link:hover { transform:translateY(-4px); background:#fff; }
+.certificate-timeline-card .card-meta { margin-top:34px; }
+.timeline-card .avatar-text { background:var(--yellow); color:#000; }
+
 .project-gallery { position:absolute; inset:0; overflow:hidden; background:#141414; }
-.project-gallery img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; animation:projectGallery 12s infinite; }
+.project-gallery img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:center 22%; opacity:0; animation:projectGallery 12s infinite; }
 .project-gallery img:nth-child(2) { animation-delay:3s; }
 .project-gallery img:nth-child(3) { animation-delay:6s; }
 .project-gallery img:nth-child(4) { animation-delay:9s; }
@@ -606,8 +613,18 @@ a.contact-card:hover { transform:translateX(7px); background:var(--yellow); }
 .contact-form small { text-align:center; font-size:9px; color:rgba(0,0,0,.55); }
 
 @media (min-width:901px) {
-  .about { height:230vh; }
-  .about .section-heading { margin-bottom:8vh; }
+  .about { height:315vh; }
+  .about .section-heading { margin-bottom:7vh; }
+  .about .timeline { height:245vh; }
+  .about .timeline-card { min-height:42vh; }
+  .about .timeline-card:nth-of-type(1) { left:59.91%; top:0; }
+  .about .timeline-card:nth-of-type(2) { left:16.64%; top:19%; }
+  .about .timeline-card:nth-of-type(3) { left:9.4%; top:39%; }
+  .about .timeline-card:nth-of-type(4) { left:49.18%; top:59%; }
+  .about .timeline-card:nth-of-type(5) { left:52.06%; top:79%; }
+  .academic-score { margin-top:2.2vh; font-size:4vw; }
+  .academic-score small { font-size:1.25vw; }
+  .certificate-link { border-radius:.56vw; padding:.76vw 1vw; font-size:.78vw; }
   .about-content { gap:17vh; }
   .education-card { min-height:36vh; padding:2.1vw; }
   .education-card strong { margin-top:7vh; font-size:5vw; }
@@ -649,6 +666,10 @@ a.contact-card:hover { transform:translateX(7px); background:var(--yellow); }
   .certificate-heading h3 { font-size:45px; }
   .certificate-grid { grid-template-columns:1fr; }
   .certificate-card { min-height:310px; }
+  .timeline-card { min-height:360px; }
+  .academic-score { margin-top:24px; font-size:62px; }
+  .certificate-timeline-card .card-meta { align-items:flex-end; flex-wrap:wrap; }
+  .certificate-link { margin:14px 0 0; width:100%; text-align:center; }
   .project-info h3 { font-size:23px; }
   .project-info p { font-size:11px; }
   .project-actions { margin-top:10px; }
