@@ -7,6 +7,7 @@ document.body.classList.add("is-loading");
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const hasMotion = Boolean(window.gsap && window.ScrollTrigger);
+const uiCopy = window.portfolioCopy || {};
 let lenis = null;
 
 qsa("[data-word-reveal]").forEach(element => {
@@ -65,7 +66,7 @@ qsa(".project-gallery").forEach(gallery => {
   showImage(0);
   if (images.length < 2) return;
   gallery.classList.add("has-controls");
-  gallery.insertAdjacentHTML("beforeend", `<button class="gallery-control gallery-prev" type="button" aria-label="Previous project screenshot">←</button><button class="gallery-control gallery-next" type="button" aria-label="Next project screenshot">→</button><span class="gallery-count" aria-live="polite">01 / 0${images.length}</span>`);
+  gallery.insertAdjacentHTML("beforeend", `<button class="gallery-control gallery-prev" type="button" aria-label="${uiCopy.previousScreenshot || "Previous project screenshot"}">&#8592;</button><button class="gallery-control gallery-next" type="button" aria-label="${uiCopy.nextScreenshot || "Next project screenshot"}">&#8594;</button><span class="gallery-count" aria-live="polite">01 / 0${images.length}</span>`);
   const count = qs(".gallery-count", gallery);
   const step = direction => {
     showImage(activeIndex + direction);
@@ -334,9 +335,9 @@ function createMotionScenes() {
   const rollingTitles = [
     { heading:qs(".about .section-heading h2"), trigger:qs(".about"), start:"top 90%", extras:qsa(".about .section-heading > :not(h2)") },
     { heading:qs(".work-intro h2"), trigger:qs(".work-sticky"), start:"top 80%", extras:qsa(".work-intro .eyebrow,.work-intro > p") },
-    { heading:qs(".services .section-heading h2"), trigger:qs(".services .section-heading"), start:"top 94%", end:"top 48%", scrub:.58, extras:qsa(".services .section-heading > :not(h2)") },
-    { heading:qs(".testimonials .section-heading h2"), trigger:qs(".testimonials .section-heading"), start:"top 90%", extras:qsa(".testimonials .section-heading > :not(h2)") },
-    { heading:qs(".contact .section-heading h2"), trigger:qs(".contact .section-heading"), start:"top 90%", extras:qsa(".contact .section-heading > :not(h2)") }
+    { heading:qs(".services .section-heading h2"), trigger:qs(".services .section-heading"), start:"top 60%", end:"top 34%", scrub:.42, extras:qsa(".services .section-heading > :not(h2)") },
+    { heading:qs(".testimonials .section-heading h2"), trigger:qs(".testimonials .section-heading"), start:"top 92%", end:"top 54%", scrub:.48, extras:qsa(".testimonials .section-heading > :not(h2)") },
+    { heading:qs(".contact .section-heading h2"), trigger:qs(".contact .section-heading"), start:"top 92%", end:"top 54%", scrub:.48, extras:qsa(".contact .section-heading > :not(h2)") }
   ];
 
   rollingTitles.forEach(({ heading, trigger, start, end, scrub, extras }) => {
@@ -393,10 +394,17 @@ function createMotionScenes() {
   });
 
   gsap.fromTo(".journey-line", { yPercent:115, autoAlpha:0, rotate:2, filter:"blur(7px)", clipPath:"inset(0 0 100% 0)" }, {
-    yPercent:0, autoAlpha:1, rotate:0, filter:"blur(0px)", clipPath:"inset(0 0 0% 0)", stagger:.12, duration:1, ease:"none",
-    scrollTrigger:{ trigger:".journey h2", start:"top 94%", end:"bottom 52%", scrub:.62 }
+    yPercent:0, autoAlpha:1, rotate:0, filter:"blur(0px)", clipPath:"inset(0 0 0% 0)", stagger:.07, duration:.65, ease:"none",
+    scrollTrigger:{ trigger:".journey h2", start:"top 93%", end:"bottom 62%", scrub:.35 }
   });
   gsap.fromTo(".journey-inner > p", { y:35, autoAlpha:0 }, { y:0, autoAlpha:1, duration:.8, ease:"power3.out", scrollTrigger:{ trigger:".journey-inner > p", start:"top 90%", once:true } });
+  gsap.to(".journey-inner", {
+    yPercent:-28,
+    autoAlpha:0,
+    filter:"blur(5px)",
+    ease:"none",
+    scrollTrigger:{ trigger:".journey", start:"bottom 98%", end:"bottom 62%", scrub:.42 }
+  });
 
   gsap.fromTo(".quote-card", { yPercent:10, scale:.7, autoAlpha:0 }, {
     yPercent:0, scale:1, autoAlpha:1, stagger:.09, duration:1, ease:"expo.out",
@@ -459,7 +467,7 @@ const toast = qs(".toast");
 qs(".email-copy")?.addEventListener("click", async event => {
   try {
     await navigator.clipboard.writeText(event.currentTarget.dataset.copy);
-    toast.textContent = "Email copied";
+    toast.textContent = uiCopy.emailCopied || "Email copied";
   } catch {
     toast.textContent = "2008.varunreddy@gmail.com";
   }
@@ -470,7 +478,7 @@ qs(".email-copy")?.addEventListener("click", async event => {
 qsa(".read-more").forEach(button => button.addEventListener("click", () => {
   const card = button.closest(".timeline-card");
   const open = card.classList.toggle("open");
-  button.textContent = open ? "Read less" : "Read more";
+  button.textContent = open ? (uiCopy.readLess || "Read less") : (uiCopy.readMore || "Read more");
   setTimeout(() => ScrollTrigger?.refresh(), 480);
 }));
 
@@ -531,8 +539,8 @@ qs("#contact-form")?.addEventListener("submit", event => {
   const name = String(data.get("name") || "").trim();
   const email = String(data.get("email") || "").trim();
   const message = String(data.get("message") || "").trim();
-  const subject = encodeURIComponent(`Portfolio message from ${name}`);
-  const body = encodeURIComponent(`${message}\n\nFrom: ${name}\nEmail: ${email}`);
+  const subject = encodeURIComponent(uiCopy.mailSubject ? uiCopy.mailSubject(name) : `Portfolio message from ${name}`);
+  const body = encodeURIComponent(`${message}\n\n${uiCopy.mailFrom || "From"}: ${name}\n${uiCopy.mailEmail || "Email"}: ${email}`);
   window.location.href = `mailto:2008.varunreddy@gmail.com?subject=${subject}&body=${body}`;
 });
 

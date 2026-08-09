@@ -7,9 +7,21 @@
     <meta name="description" content="VARUN — Cybersecurity student, Python developer, and graphite artist." />
     <title>Cybersecurity Portfolio — VARUN®</title>
     <link rel="preconnect" href="https://cdn.prod.website-files.com" />
-    <link rel="stylesheet" href="styles.css?v=20260809-artfix6" />
+    <link rel="stylesheet" href="styles.css?v=20260809-bilingual7" />
   </head>
-  <body>
+  <body class="language-pending is-loading">
+    <div class="language-gate" role="dialog" aria-modal="true" aria-labelledby="language-title" aria-describedby="language-description">
+      <div class="language-panel glass-panel">
+        <span class="language-kicker">LANGUAGE · 언어</span>
+        <strong class="language-mark" aria-hidden="true">VARUN<sup>®</sup></strong>
+        <h1 id="language-title">Choose your language<br /><span lang="ko">언어를 선택하세요</span></h1>
+        <p id="language-description">Select the language for the complete portfolio experience.<br /><span lang="ko">포트폴리오 전체에 사용할 언어를 선택해 주세요.</span></p>
+        <div class="language-actions">
+          <button type="button" data-language="en"><small>01</small><span>English</span><b>Continue →</b></button>
+          <button type="button" data-language="ko"><small>02</small><span lang="ko">한국어</span><b lang="ko">계속하기 →</b></button>
+        </div>
+      </div>
+    </div>
     <div class="loader" aria-hidden="true">
       <div class="loader-word">VARUN</div>
       <div class="loader-line"><span></span></div>
@@ -169,10 +181,10 @@
         <div class="content-shell">
           <div class="section-heading reveal"><span class="eyebrow">Art archive</span><h2>Graphite (&amp;)<br />Digital Studies</h2><p>Art trains the same skills I value in security: patience, observation, accuracy, and attention to what others overlook.</p></div>
           <div class="service-grid art-grid">
-            <article class="service-card art-card reveal"><div class="art-media"><img src="assets/art/portrait-study.png" alt="Portrait study artwork" /></div><div class="art-caption"><span>01</span><h3>Portrait Study</h3><p>Character, contrast, and expression.</p></div></article>
-            <article class="service-card art-card reveal"><div class="art-media"><img src="assets/art/security-study.png" alt="Security themed artwork" /></div><div class="art-caption"><span>02</span><h3>Security Study</h3><p>Code and architecture in ink.</p></div></article>
-            <article class="service-card art-card reveal"><div class="art-media"><img src="assets/art/mountain-study.png" alt="Mountain landscape artwork" /></div><div class="art-caption"><span>03</span><h3>Mountain Study</h3><p>Scale, atmosphere, and direction.</p></div></article>
-            <article class="service-card art-card reveal"><div class="art-media"><img src="assets/art/architecture-study.png" alt="Architecture artwork" /></div><div class="art-caption"><span>04</span><h3>Architecture Study</h3><p>Structure, silence, and detail.</p></div></article>
+            <article class="service-card art-card reveal" data-art="01"><div class="art-caption"><span>01</span><h3>Portrait Study</h3><p>Character, contrast, and expression.</p></div></article>
+            <article class="service-card art-card reveal" data-art="02"><div class="art-caption"><span>02</span><h3>Security Study</h3><p>Code and architecture in ink.</p></div></article>
+            <article class="service-card art-card reveal" data-art="03"><div class="art-caption"><span>03</span><h3>Mountain Study</h3><p>Scale, atmosphere, and direction.</p></div></article>
+            <article class="service-card art-card reveal" data-art="04"><div class="art-caption"><span>04</span><h3>Architecture Study</h3><p>Structure, silence, and detail.</p></div></article>
           </div>
         </div>
       </section>
@@ -214,6 +226,6 @@
     <script src="motion-core.min.js?v=20260809"></script>
     <script src="motion-scroll.min.js?v=20260809"></script>
     <script src="smooth-scroll.min.js?v=20260809"></script>
-    <script src="app.js?v=20260809-artfix6"></script>
+    <script src="language.js?v=20260809-bilingual7"></script>
   </body>
 </html>
