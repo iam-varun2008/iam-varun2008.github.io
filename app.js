@@ -15,11 +15,6 @@ qsa("[data-word-reveal]").forEach(element => {
   element.innerHTML = words.map(word => `<span class="word">${word}</span>`).join(" ");
 });
 
-const journeyHeading = qs(".journey h2");
-if (journeyHeading) {
-  journeyHeading.innerHTML = journeyHeading.innerHTML.split(/<br\s*\/?>/i).map(line => `<span class="journey-line-mask"><span class="journey-line">${line}</span></span>`).join("");
-}
-
 function prepareRollingLines(element) {
   if (!element || element.dataset.rollReady) return;
   const lines = element.innerHTML.split(/<br\s*\/?>/i);
@@ -39,7 +34,7 @@ function prepareTextReveal(element) {
   element.innerHTML = text.split(/\s+/).map(word => `<span class="text-word" aria-hidden="true">${word}</span>`).join(" ");
 }
 
-qsa(".about .section-heading > p,.timeline-card > p,.work-intro > p,.project-info p,.journey-inner > p,.services .section-heading > p,.art-caption p,.testimonials .section-heading > p,.goal-card > p,.goal-card footer small,.contact .section-heading > p,.contact-card strong,.contact-card b,.contact-form label > span,.contact-form > small").forEach(prepareTextReveal);
+qsa(".about .section-heading > p,.timeline-card > p,.work-intro > p,.project-info p,.services .section-heading > p,.art-caption p,.testimonials .section-heading > p,.goal-card > p,.goal-card footer small,.contact .section-heading > p,.contact-card strong,.contact-card b,.contact-form label > span,.contact-form > small").forEach(prepareTextReveal);
 
 qsa(".mega-title > span").forEach(line => {
   line.classList.add("roll-line-mask");
@@ -435,27 +430,6 @@ function createMotionScenes() {
     scrollTrigger: { trigger: ".service-grid", start: "top 90%", once:true }
   });
 
-  gsap.fromTo(".talk-orbit", { y: 70, scale: .82, autoAlpha: 0 }, {
-    y: 0,
-    scale: 1,
-    autoAlpha: 1,
-    ease: "none",
-    scrollTrigger: { trigger: ".journey", start: "top 70%", end: "center 48%", scrub: .55 }
-  });
-
-  gsap.fromTo(".journey-line", { yPercent:115, autoAlpha:0, rotate:2, filter:"blur(7px)", clipPath:"inset(0 0 100% 0)" }, {
-    yPercent:0, autoAlpha:1, rotate:0, filter:"blur(0px)", clipPath:"inset(0 0 0% 0)", stagger:.07, duration:.65, ease:"none",
-    scrollTrigger:{ trigger:".journey h2", start:"top 93%", end:"bottom 62%", scrub:.35 }
-  });
-  gsap.fromTo(".journey-inner > p", { y:35, autoAlpha:0 }, { y:0, autoAlpha:1, duration:.8, ease:"power3.out", scrollTrigger:{ trigger:".journey-inner > p", start:"top 90%", once:true } });
-  gsap.to(".journey-inner", {
-    yPercent:-28,
-    autoAlpha:0,
-    filter:"blur(5px)",
-    ease:"none",
-    scrollTrigger:{ trigger:".journey", start:"bottom 98%", end:"bottom 62%", scrub:.42 }
-  });
-
   gsap.fromTo(".quote-card", { yPercent:10, scale:.7, autoAlpha:0 }, {
     yPercent:0, scale:1, autoAlpha:1, stagger:.09, duration:1, ease:"expo.out",
     scrollTrigger:{ trigger:".testimonial-track", start:"top 88%", once:true }
@@ -484,7 +458,7 @@ function createMotionScenes() {
     end: "bottom 48%",
     onToggle: self => {
       if (!self.isActive) return;
-      const id = section.id === "webflow_journey" ? "services" : section.id;
+      const id = section.id;
       navLinks.forEach(link => link.classList.toggle("active", link.dataset.section === id));
       if (id !== activeSectionId) {
         activeSectionId = id;

@@ -120,11 +120,6 @@
     setAttribute('.project-card:nth-child(2) img:nth-child(4)', 'alt', '저장된 포트 스캔 보고서');
     setAttribute('.project-card:nth-child(3) img', 'alt', '바룬 포트폴리오 메인 화면');
 
-    setHtml(".journey h2", "깊이 배우고<br />명확하게 만들며<br /><span>윤리적으로 시험하고</span><br /><span>계속 성장합니다</span>");
-    setText(".journey-inner > p", "방향은 분명합니다. 기초를 탄탄히 익히고, 유용한 방어형 도구를 만들며, 허가된 환경에서만 실습하고, 모든 프로젝트를 성장의 증거로 남기겠습니다.");
-    setText(".talk-orbit > span", "소통하고 싶으신가요?");
-    setText(".talk-orbit > strong", "이야기해요 ↗");
-
     setText(".services .eyebrow", "미술 아카이브");
     setHtml(".services .section-heading h2", "흑연 드로잉 (&amp;)<br />디지털 습작");
     setText(".services .section-heading > p", "예술은 보안에서 중요하게 여기는 인내, 관찰력, 정확성, 그리고 다른 사람이 지나치기 쉬운 세부 사항을 보는 힘을 길러 줍니다.");
@@ -175,7 +170,7 @@
 
   function loadPortfolio() {
     const script = document.createElement("script");
-    script.src = "app.js?v=20260809-handoff10";
+    script.src = "app.js?v=20260809-directart11";
     script.onload = () => {
       document.body.classList.remove("language-pending");
       qs(".language-gate")?.remove();
