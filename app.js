@@ -44,6 +44,37 @@ function prepareNavigationLabel(element) {
 
 qsa(".hero-nav a,.side-label").forEach(prepareNavigationLabel);
 
+function prepareButtonRoll(element) {
+  if (!element || element.dataset.buttonRollReady) return;
+  const text = element.textContent.trim();
+  element.dataset.buttonRollReady = "true";
+  element.setAttribute("aria-label", text);
+  element.innerHTML = `<span class="button-label-mask" aria-hidden="true"><span class="button-label-primary">${text}</span><span class="button-label-clone">${text}</span></span>`;
+}
+
+qsa(".book-button,.call-chip,.hero-actions a:first-child,.contact-form button,.certificate-link").forEach(prepareButtonRoll);
+
+qsa(".project-gallery").forEach(gallery => {
+  const images = qsa("img", gallery);
+  if (!images.length) return;
+  let activeIndex = 0;
+  const showImage = index => {
+    activeIndex = (index + images.length) % images.length;
+    images.forEach((image, imageIndex) => image.classList.toggle("is-active", imageIndex === activeIndex));
+  };
+  showImage(0);
+  if (images.length < 2) return;
+  gallery.classList.add("has-controls");
+  gallery.insertAdjacentHTML("beforeend", `<button class="gallery-control gallery-prev" type="button" aria-label="Previous project screenshot">←</button><button class="gallery-control gallery-next" type="button" aria-label="Next project screenshot">→</button><span class="gallery-count" aria-live="polite">01 / 0${images.length}</span>`);
+  const count = qs(".gallery-count", gallery);
+  const step = direction => {
+    showImage(activeIndex + direction);
+    count.textContent = `${String(activeIndex + 1).padStart(2, "0")} / ${String(images.length).padStart(2, "0")}`;
+  };
+  qs(".gallery-prev", gallery).addEventListener("click", event => { event.stopPropagation(); step(-1); });
+  qs(".gallery-next", gallery).addEventListener("click", event => { event.stopPropagation(); step(1); });
+});
+
 function rollNavigationLabel(link) {
   if (!hasMotion || reduceMotion || !link) return;
   const primary = qs(".nav-label-primary", link);
@@ -223,7 +254,7 @@ function createMotionScenes() {
           .set(item.source, { autoAlpha:0 }, handoff);
       });
 
-      const maxProjectShift = () => Math.max(0, projectTrack.scrollWidth - (innerWidth - 255) + 34);
+      const maxProjectShift = () => Math.max(0, projectTrack.scrollWidth - (innerWidth - 255) + 68);
       gsap.set(projectCards, { yPercent: 10, scale:.6, autoAlpha: 0 });
       gsap.to(projectCards.slice(0, 2), {
         yPercent:0, scale:1, autoAlpha:1, duration:1.1, stagger:.1, ease:"expo.out",
@@ -231,7 +262,13 @@ function createMotionScenes() {
       });
       const workTween = gsap.to(projectTrack, {
         x: () => -maxProjectShift(), ease:"none",
-        scrollTrigger:{ trigger:work, start:"top top", end:"bottom bottom", scrub:1, invalidateOnRefresh:true }
+        scrollTrigger:{
+          trigger:work,
+          start:"top top",
+          end:() => `+=${Math.max(innerHeight, work.offsetHeight - innerHeight * 1.75)}`,
+          scrub:1,
+          invalidateOnRefresh:true
+        }
       });
       projectCards.slice(2).forEach(card => gsap.to(card, {
         yPercent:0, scale:1, autoAlpha:1, duration:1.1, ease:"expo.out",
@@ -297,12 +334,12 @@ function createMotionScenes() {
   const rollingTitles = [
     { heading:qs(".about .section-heading h2"), trigger:qs(".about"), start:"top 90%", extras:qsa(".about .section-heading > :not(h2)") },
     { heading:qs(".work-intro h2"), trigger:qs(".work-sticky"), start:"top 80%", extras:qsa(".work-intro .eyebrow,.work-intro > p") },
-    { heading:qs(".services .section-heading h2"), trigger:qs(".services .section-heading"), start:"top 90%", extras:qsa(".services .section-heading > :not(h2)") },
+    { heading:qs(".services .section-heading h2"), trigger:qs(".services .section-heading"), start:"top 94%", end:"top 48%", scrub:.58, extras:qsa(".services .section-heading > :not(h2)") },
     { heading:qs(".testimonials .section-heading h2"), trigger:qs(".testimonials .section-heading"), start:"top 90%", extras:qsa(".testimonials .section-heading > :not(h2)") },
     { heading:qs(".contact .section-heading h2"), trigger:qs(".contact .section-heading"), start:"top 90%", extras:qsa(".contact .section-heading > :not(h2)") }
   ];
 
-  rollingTitles.forEach(({ heading, trigger, start, extras }) => {
+  rollingTitles.forEach(({ heading, trigger, start, end, scrub, extras }) => {
     if (!heading || !trigger) return;
     gsap.fromTo(qsa(".roll-line", heading), { yPercent:110, rotate:3, filter:"blur(3px)" }, {
       yPercent:0,
@@ -312,7 +349,7 @@ function createMotionScenes() {
       stagger:.1,
       delay:.22,
       ease:"expo.out",
-      scrollTrigger:{ trigger, start, once:true }
+      scrollTrigger:{ trigger, start, end:end || "top 55%", scrub:scrub || false, once:!scrub }
     });
     gsap.fromTo(extras, { y:18, autoAlpha:0 }, {
       y:0,
@@ -355,9 +392,9 @@ function createMotionScenes() {
     scrollTrigger: { trigger: ".journey", start: "top 70%", end: "center 48%", scrub: .55 }
   });
 
-  gsap.fromTo(".journey-line", { yPercent:105, autoAlpha:0, clipPath:"inset(0 0 100% 0)" }, {
-    yPercent:0, autoAlpha:1, clipPath:"inset(0 0 0% 0)", stagger:.1, duration:1, ease:"expo.out",
-    scrollTrigger:{ trigger:".journey h2", start:"top 86%", once:true }
+  gsap.fromTo(".journey-line", { yPercent:115, autoAlpha:0, rotate:2, filter:"blur(7px)", clipPath:"inset(0 0 100% 0)" }, {
+    yPercent:0, autoAlpha:1, rotate:0, filter:"blur(0px)", clipPath:"inset(0 0 0% 0)", stagger:.12, duration:1, ease:"none",
+    scrollTrigger:{ trigger:".journey h2", start:"top 94%", end:"bottom 52%", scrub:.62 }
   });
   gsap.fromTo(".journey-inner > p", { y:35, autoAlpha:0 }, { y:0, autoAlpha:1, duration:.8, ease:"power3.out", scrollTrigger:{ trigger:".journey-inner > p", start:"top 90%", once:true } });
 
@@ -464,6 +501,19 @@ if (cursor && matchMedia("(pointer:fine)").matches) {
   window.addEventListener("pointermove", event => {
     gsap.to(cursor, { left: event.clientX, top: event.clientY, duration: .18, overwrite: "auto", ease: "power2.out" });
   });
+
+  if (matchMedia("(pointer:fine)").matches) {
+    qsa(".timeline-card,.project-card,.art-card,.goal-card,.contact-card").forEach(card => {
+      const layers = qsa(":scope > *", card).filter(layer => !layer.classList.contains("gallery-control"));
+      card.addEventListener("pointermove", event => {
+        const bounds = card.getBoundingClientRect();
+        const x = (event.clientX - bounds.left) / bounds.width - .5;
+        const y = (event.clientY - bounds.top) / bounds.height - .5;
+        gsap.to(layers, { x:x * 9, y:y * 9, rotateX:-y * 3, rotateY:x * 3, transformPerspective:900, duration:.38, ease:"power2.out", overwrite:true });
+      });
+      card.addEventListener("pointerleave", () => gsap.to(layers, { x:0, y:0, rotateX:0, rotateY:0, duration:.65, ease:"expo.out", overwrite:true }));
+    });
+  }
   qsa(".cursor-target").forEach(item => {
     item.addEventListener("mouseenter", () => cursor.classList.add("is-view"));
     item.addEventListener("mouseleave", () => cursor.classList.remove("is-view"));
