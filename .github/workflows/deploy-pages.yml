@@ -25,17 +25,15 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build website
-        run: npm run build
+      - name: Prepare static website
+        shell: bash
+        run: |
+          mkdir -p dist/assets dist/fonts
+          cp index.html styles.css app.js dist/
+          cp motion-core.min.js motion-scroll.min.js smooth-scroll.min.js dist/
+          cp assets/varun-hero-original-v2.png dist/assets/
+          cp fonts/*.woff2 dist/fonts/
+          touch dist/.nojekyll
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
