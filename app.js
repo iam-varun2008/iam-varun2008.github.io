@@ -2,6 +2,7 @@ const qs = (selector, scope = document) => scope.querySelector(selector);
 const qsa = (selector, scope = document) => [...scope.querySelectorAll(selector)];
 
 history.scrollRestoration = "manual";
+const initialHash = location.hash;
 window.scrollTo(0, 0);
 document.body.classList.add("is-loading");
 
@@ -18,12 +19,17 @@ qsa("[data-word-reveal]").forEach(element => {
 function prepareRollingLines(element) {
   if (!element || element.dataset.rollReady) return;
   const lines = element.innerHTML.split(/<br\s*\/?>/i);
+  const accessibleText = lines.map(line => {
+    const textOnly = document.createElement("span");
+    textOnly.innerHTML = line;
+    return textOnly.textContent.trim();
+  }).join(" ").replace(/\s+/g, " ");
   element.dataset.rollReady = "true";
-  element.setAttribute("aria-label", element.innerText.trim().replace(/\s+/g, " "));
+  element.setAttribute("aria-label", accessibleText);
   element.innerHTML = lines.map(line => `<span class="roll-line-mask"><span class="roll-line" aria-hidden="true">${line.trim()}</span></span>`).join("");
 }
 
-qsa(".about .section-heading h2,.work-intro h2,.services .section-heading h2,.testimonials .section-heading h2,.contact .section-heading h2,.timeline-card h3,.art-caption h3,.goal-card h3").forEach(prepareRollingLines);
+qsa(".about .section-heading h2,.technical-foundation h3,.work-intro h2,.services .section-heading h2,.testimonials .section-heading h2,.contact .section-heading h2,.timeline-card h3,.art-caption h3,.goal-card h3").forEach(prepareRollingLines);
 
 function prepareTextReveal(element) {
   if (!element || element.dataset.textRevealReady) return;
@@ -34,7 +40,7 @@ function prepareTextReveal(element) {
   element.innerHTML = text.split(/\s+/).map(word => `<span class="text-word" aria-hidden="true">${word}</span>`).join(" ");
 }
 
-qsa(".about .section-heading > p,.timeline-card > p,.work-intro > p,.project-info p,.services .section-heading > p,.art-caption p,.testimonials .section-heading > p,.goal-card > p,.goal-card footer small,.contact .section-heading > p,.contact-card strong,.contact-card b,.contact-form label > span,.contact-form > small").forEach(prepareTextReveal);
+qsa(".about .section-heading > p,.timeline-card > p,.foundation-group dd,.work-intro > p,.project-info p,.services .section-heading > p,.art-caption p,.testimonials .section-heading > p,.goal-card > p,.goal-card footer small,.contact .section-heading > p,.contact-card strong,.contact-card b,.contact-form label > span,.contact-form > small").forEach(prepareTextReveal);
 
 qsa(".mega-title > span").forEach(line => {
   line.classList.add("roll-line-mask");
@@ -61,26 +67,84 @@ function prepareButtonRoll(element) {
 
 qsa(".book-button,.call-chip,.hero-actions a:first-child,.contact-form button,.certificate-link").forEach(prepareButtonRoll);
 
+const galleryStates = [];
 qsa(".project-gallery").forEach(gallery => {
   const images = qsa("img", gallery);
   if (!images.length) return;
-  let activeIndex = 0;
-  const showImage = index => {
-    activeIndex = (index + images.length) % images.length;
-    images.forEach((image, imageIndex) => image.classList.toggle("is-active", imageIndex === activeIndex));
+  const state = { gallery, images, activeIndex:0, count:null };
+  state.showImage = index => {
+    state.activeIndex = (index + images.length) % images.length;
+    gallery.dataset.activeIndex = String(state.activeIndex);
+    images.forEach((image, imageIndex) => image.classList.toggle("is-active", imageIndex === state.activeIndex));
+    if (state.count) state.count.textContent = `${String(state.activeIndex + 1).padStart(2, "0")} / ${String(images.length).padStart(2, "0")}`;
   };
-  showImage(0);
-  if (images.length < 2) return;
-  gallery.classList.add("has-controls");
-  gallery.insertAdjacentHTML("beforeend", `<button class="gallery-control gallery-prev" type="button" aria-label="${uiCopy.previousScreenshot || "Previous project screenshot"}">&#8592;</button><button class="gallery-control gallery-next" type="button" aria-label="${uiCopy.nextScreenshot || "Next project screenshot"}">&#8594;</button><span class="gallery-count" aria-live="polite">01 / 0${images.length}</span>`);
-  const count = qs(".gallery-count", gallery);
-  const step = direction => {
-    showImage(activeIndex + direction);
-    count.textContent = `${String(activeIndex + 1).padStart(2, "0")} / ${String(images.length).padStart(2, "0")}`;
-  };
-  qs(".gallery-prev", gallery).addEventListener("click", event => { event.stopPropagation(); step(-1); });
-  qs(".gallery-next", gallery).addEventListener("click", event => { event.stopPropagation(); step(1); });
+  gallery.insertAdjacentHTML("beforeend", `<button class="gallery-expand" type="button" aria-label="${uiCopy.viewFullImage || "View screenshot full size"}">↗</button>`);
+  if (images.length > 1) {
+    gallery.classList.add("has-controls");
+    gallery.insertAdjacentHTML("beforeend", `<button class="gallery-control gallery-prev" type="button" aria-label="${uiCopy.previousScreenshot || "Previous project screenshot"}">&#8592;</button><button class="gallery-control gallery-next" type="button" aria-label="${uiCopy.nextScreenshot || "Next project screenshot"}">&#8594;</button><span class="gallery-count" aria-live="polite"></span>`);
+    state.count = qs(".gallery-count", gallery);
+    qs(".gallery-prev", gallery).addEventListener("click", event => { event.stopPropagation(); state.showImage(state.activeIndex - 1); });
+    qs(".gallery-next", gallery).addEventListener("click", event => { event.stopPropagation(); state.showImage(state.activeIndex + 1); });
+  }
+  state.showImage(0);
+  galleryStates.push(state);
 });
+
+let activeViewerGallery = null;
+let viewerReturnFocus = null;
+if (galleryStates.length) {
+  document.body.insertAdjacentHTML("beforeend", `<div class="image-viewer" role="dialog" aria-modal="true" aria-hidden="true" aria-label="${uiCopy.imageViewer || "Project screenshot viewer"}"><div class="image-viewer-dialog"><img src="" alt="" /><p class="image-viewer-caption" aria-live="polite"></p><button class="viewer-control viewer-prev" type="button" aria-label="${uiCopy.previousScreenshot || "Previous project screenshot"}">←</button><button class="viewer-control viewer-next" type="button" aria-label="${uiCopy.nextScreenshot || "Next project screenshot"}">→</button><button class="viewer-control viewer-close" type="button" aria-label="${uiCopy.closeViewer || "Close image viewer"}">×</button></div></div>`);
+  const viewer = qs(".image-viewer");
+  const viewerImage = qs(".image-viewer img");
+  const viewerCaption = qs(".image-viewer-caption");
+  const viewerClose = qs(".viewer-close");
+  const updateViewer = () => {
+    if (!activeViewerGallery) return;
+    const image = activeViewerGallery.images[activeViewerGallery.activeIndex];
+    viewerImage.src = image.currentSrc || image.src;
+    viewerImage.alt = image.alt;
+    viewerCaption.textContent = image.alt;
+  };
+  const stepViewer = direction => {
+    if (!activeViewerGallery) return;
+    activeViewerGallery.showImage(activeViewerGallery.activeIndex + direction);
+    updateViewer();
+  };
+  const closeViewer = () => {
+    viewer.classList.remove("is-open");
+    viewer.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("viewer-open");
+    viewerReturnFocus?.focus();
+    activeViewerGallery = null;
+  };
+  galleryStates.forEach(state => qs(".gallery-expand", state.gallery).addEventListener("click", event => {
+    event.stopPropagation();
+    activeViewerGallery = state;
+    viewerReturnFocus = event.currentTarget;
+    updateViewer();
+    viewer.classList.add("is-open");
+    viewer.setAttribute("aria-hidden", "false");
+    document.body.classList.add("viewer-open");
+    setTimeout(() => viewerClose.focus({ preventScroll:true }), 50);
+  }));
+  qs(".viewer-prev").addEventListener("click", () => stepViewer(-1));
+  qs(".viewer-next").addEventListener("click", () => stepViewer(1));
+  viewerClose.addEventListener("click", closeViewer);
+  viewer.addEventListener("click", event => { if (event.target === viewer) closeViewer(); });
+  document.addEventListener("keydown", event => {
+    if (!viewer.classList.contains("is-open")) return;
+    if (event.key === "Escape") closeViewer();
+    if (event.key === "ArrowLeft") stepViewer(-1);
+    if (event.key === "ArrowRight") stepViewer(1);
+    if (event.key === "Tab") {
+      const controls = qsa("button", viewer);
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
+  });
+}
 
 function rollNavigationLabel(link) {
   if (!hasMotion || reduceMotion || !link) return;
@@ -117,6 +181,16 @@ function startSmoothScroll() {
   }));
 }
 
+function restoreInitialSection() {
+  if (!initialHash) return;
+  const target = qs(initialHash);
+  if (!target) return;
+  setTimeout(() => {
+    if (lenis) lenis.scrollTo(target, { offset:0, duration:reduceMotion ? 0 : .8 });
+    else target.scrollIntoView({ block:"start" });
+  }, 80);
+}
+
 function playIntro() {
   const loader = qs(".loader");
   const loaderWord = qs(".loader-word");
@@ -138,6 +212,7 @@ function playIntro() {
     document.body.classList.remove("is-loading");
     document.body.classList.add("intro-complete");
     createMotionScenes();
+    restoreInitialSection();
     return;
   }
 
@@ -174,6 +249,7 @@ function playIntro() {
       createMotionScenes();
       startSmoothScroll();
       ScrollTrigger.refresh();
+      restoreInitialSection();
     }
   });
 
@@ -330,6 +406,18 @@ function createMotionScenes() {
     if (timelineDots[index]) gsap.to(timelineDots[index], { scale:1, autoAlpha:1, duration:.45, ease:"back.out(2)", scrollTrigger:{ trigger:card, start:"top 90%", once:true } });
   });
 
+  const foundation = qs(".technical-foundation");
+  if (foundation) {
+    gsap.fromTo(qsa(".roll-line", foundation), { yPercent:110, rotate:3, filter:"blur(3px)" }, {
+      yPercent:0, rotate:0, filter:"blur(0px)", duration:.72, stagger:.08, ease:"expo.out",
+      scrollTrigger:{ trigger:foundation, start:"top 88%", once:true }
+    });
+    gsap.fromTo(qsa(".foundation-group", foundation), { y:24, autoAlpha:0 }, {
+      y:0, autoAlpha:1, duration:.62, stagger:.07, ease:"power3.out",
+      scrollTrigger:{ trigger:foundation, start:"top 84%", once:true }
+    });
+  }
+
   const genericReveals = qsa(".reveal").filter(item => !item.matches(".timeline-card,.overview-copy,.mega-title,.service-card") && !item.querySelector(".roll-line"));
   genericReveals.forEach((item, index) => {
     gsap.fromTo(item,
@@ -477,14 +565,27 @@ menuButton?.addEventListener("click", () => {
   mobileMenu.classList.toggle("open", open);
   mobileMenu.setAttribute("aria-hidden", String(!open));
   menuButton.setAttribute("aria-expanded", String(open));
+  menuButton.setAttribute("aria-label", open ? (uiCopy.closeMenu || "Close menu") : (uiCopy.openMenu || "Open menu"));
   document.body.style.overflow = open ? "hidden" : "";
+  if (open) qs("a", mobileMenu)?.focus();
 });
 qsa(".mobile-menu a").forEach(link => link.addEventListener("click", () => {
   mobileMenu.classList.remove("open");
   mobileMenu.setAttribute("aria-hidden", "true");
   menuButton.setAttribute("aria-expanded", "false");
+  menuButton.setAttribute("aria-label", uiCopy.openMenu || "Open menu");
   document.body.style.overflow = "";
+  if (innerWidth <= 900) setTimeout(() => qs(link.getAttribute("href"))?.scrollIntoView({ block:"start" }), 0);
 }));
+document.addEventListener("keydown", event => {
+  if (event.key !== "Escape" || !mobileMenu?.classList.contains("open")) return;
+  mobileMenu.classList.remove("open");
+  mobileMenu.setAttribute("aria-hidden", "true");
+  menuButton.setAttribute("aria-expanded", "false");
+  menuButton.setAttribute("aria-label", uiCopy.openMenu || "Open menu");
+  document.body.style.overflow = "";
+  menuButton.focus();
+});
 
 
 const toast = qs(".toast");

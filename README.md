@@ -1,4 +1,4 @@
-# Varun Reddy — Portfolio
+# Nandi Varun Reddy — Portfolio
 
 The source for [iam-varun2008.github.io](https://iam-varun2008.github.io/), a bilingual English/Korean portfolio focused on cybersecurity projects, academic progress, certifications, and artwork.
 
