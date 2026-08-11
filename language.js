@@ -101,15 +101,15 @@
     setAttribute(".project-card:nth-child(2) .project-gallery", "aria-label", "포트 취약점 스캐너 스크린샷");
     setList(".project-card:nth-child(1) .project-tags span", ["01", "Python", "로그", "방어"]);
     setList(".project-card:nth-child(2) .project-tags span", ["02", "Python", "네트워크", "위험"]);
-    setList(".project-card:nth-child(3) .project-tags span", ["03", "HTML", "CSS", "모션"]);
+    setAttribute(".project-card:nth-child(3) .project-gallery", "aria-label", "네트워크 보안 모니터 스크린샷");
+    setList(".project-card:nth-child(3) .project-tags span", ["03", "Python", "Scapy", "Streamlit"]);
     setText(".project-card:nth-child(1) .project-info h3", "로그 분석기");
     setText(".project-card:nth-child(1) .project-info p", "Apache 형식의 로그를 구문 분석해 로그인 실패, 관리자 접근, 404 오류, 요청 수, 의심스러운 활동을 보고합니다.");
     setText(".project-card:nth-child(2) .project-info h3", "포트 취약점 스캐너");
     setText(".project-card:nth-child(2) .project-info p", "허가된 대상의 포트를 스캔하고 노출된 서비스를 식별하며, 기본 위험을 분석해 실행 가능한 권고 사항을 생성합니다.");
-    setText(".project-card:nth-child(3) .project-info h3", "바룬 포트폴리오");
-    setText(".project-card:nth-child(3) .project-info p", "사이버보안 프로젝트, 학업 성과, 수료증, 목표, 예술 작업을 모션 중심으로 구성한 개인 포트폴리오입니다.");
-    setText(".project-card:nth-child(1) .project-actions a:first-child,.project-card:nth-child(2) .project-actions a:first-child", "데모 ↗");
-    setText(".project-card:nth-child(3) .project-actions a:first-child", "라이브 ↗");
+    setText(".project-card:nth-child(3) .project-info h3", "네트워크 보안 모니터");
+    setText(".project-card:nth-child(3) .project-info p", "실시간 트래픽을 수집하고 규칙 기반 위협 탐지를 적용하며, 경보 기록을 저장하고 실시간 Streamlit 대시보드에서 활동을 시각화합니다.");
+    setText(".project-card .project-actions a:first-child", "데모 ↗");
     setAttribute('.project-card:nth-child(1) img:nth-child(1)', 'alt', '로그 분석기 소스 코드');
     setAttribute('.project-card:nth-child(1) img:nth-child(2)', 'alt', '로그 분석기 실행 화면');
     setAttribute('.project-card:nth-child(1) img:nth-child(3)', 'alt', '터미널의 로그 분석 보고서');
@@ -118,7 +118,9 @@
     setAttribute('.project-card:nth-child(2) img:nth-child(2)', 'alt', '스캐너 대상 입력 화면');
     setAttribute('.project-card:nth-child(2) img:nth-child(3)', 'alt', '포트 취약점 보고서');
     setAttribute('.project-card:nth-child(2) img:nth-child(4)', 'alt', '저장된 포트 스캔 보고서');
-    setAttribute('.project-card:nth-child(3) img', 'alt', '바룬 포트폴리오 메인 화면');
+    setAttribute('.project-card:nth-child(3) img:nth-child(1)', 'alt', '네트워크 보안 모니터링 대시보드 개요');
+    setAttribute('.project-card:nth-child(3) img:nth-child(2)', 'alt', '프로토콜 분포 및 경보 기록 대시보드');
+    setAttribute('.project-card:nth-child(3) img:nth-child(3)', 'alt', '네트워크 보안 모니터 탐지 테스트 통과 화면');
 
     setText(".services .eyebrow", "미술 아카이브");
     setHtml(".services .section-heading h2", "흑연 드로잉 (&amp;)<br />디지털 습작");
@@ -170,7 +172,7 @@
 
   function loadPortfolio() {
     const script = document.createElement("script");
-    script.src = "app.js?v=20260809-directart11";
+    script.src = "app.js?v=20260811-network12";
     script.onload = () => {
       document.body.classList.remove("language-pending");
       qs(".language-gate")?.remove();

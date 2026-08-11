@@ -575,8 +575,8 @@ main { width:100%; }
 .gallery-prev { left:12px; }
 .gallery-next { right:12px; }
 .gallery-count { position:absolute; z-index:6; left:50%; top:15px; transform:translateX(-50%); padding:5px 8px; border-radius:999px; background:rgba(0,0,0,.6); color:#fff; backdrop-filter:blur(9px); font-size:9px; font-weight:900; letter-spacing:.06em; }
-.portfolio-project .project-gallery { background:radial-gradient(circle at 50% 35%,#5c554d,#111 72%); }
-.portfolio-project .project-gallery img { object-fit:contain; object-position:center bottom; }
+.network-monitor-project .project-gallery { background:radial-gradient(circle at 50% 35%,#242932,#0d0f14 72%); }
+.network-monitor-project .project-gallery img { object-fit:contain; object-position:center; }
 @keyframes projectGallery { 0%,20% { opacity:1; transform:scale(1); } 25%,95% { opacity:0; transform:scale(1.035); } 100% { opacity:1; transform:scale(1); } }
 .project-card::after { background:linear-gradient(transparent 25%,rgba(0,0,0,.22) 48%,rgba(0,0,0,.94) 82%); pointer-events:none; }
 .project-card:hover .project-gallery img { filter:saturate(1.08); }
