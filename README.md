@@ -1,33 +1,19 @@
-# Nandi Varun Reddy — 3D Portfolio
+# Varun Reddy — Portfolio
 
-An interactive, hand-drawn 3D portfolio presenting my academic journey, cybersecurity skills, certifications, software projects, artwork, and contact information.
+The source for [iam-varun2008.github.io](https://iam-varun2008.github.io/), a bilingual English/Korean portfolio focused on cybersecurity projects, academic progress, certifications, and artwork.
 
-## Highlights
+## Current website
 
-- Admissions-focused About Me experience
-- Grade 10, 11, and 12 academic results
-- CS50P and TryHackMe Pre-Security certificates
-- Python cybersecurity projects with screenshots, demos, and source links
-- Interactive project files and animated rooms
-- GitHub and email contact experience
-- Responsive and accessible navigation
+The portfolio is a lightweight static site built with HTML, CSS, JavaScript, GSAP-style motion helpers, and GitHub Pages.
 
-## Built with
+- `index.html` — page structure and content
+- `styles.css` — responsive layout and visual design
+- `app.js` — motion and interaction behavior
+- `language.js` — English/Korean language selection
+- `assets/` — current artwork, project media, certificates, and portrait
+- `fonts/` — local portfolio fonts
 
-React, Vite, Three.js, React Three Fiber, Drei, GSAP, and Sass.
-
-## Run locally
-
-```bash
-npm install
-npm run dev
-```
-
-Create a production build with:
-
-```bash
-npm run build
-```
+The GitHub Actions workflow in `.github/workflows/deploy-pages.yml` publishes the current site to GitHub Pages.
 
 ## Contact
 
