@@ -81,7 +81,7 @@ body.language-switching .language-toggle { pointer-events:none; opacity:.72; }
 .language-reel-scene { position:fixed; inset:0; z-index:94; overflow:hidden; pointer-events:none; background:var(--stone); }
 .language-reel-scene-scroll { position:absolute; left:0; width:100%; }
 .language-reel-scene [data-language-reel-mask],.language-reel-scene [data-language-reel-mask-child] { color:transparent!important; text-shadow:none!important; }
-.language-reel-scene.is-spinning { animation:languageSceneSettle .873s cubic-bezier(.22,.74,.2,1) both; }
+.language-reel-scene.is-spinning { animation:languageSceneSettle .3s cubic-bezier(.22,.74,.2,1) both; }
 .language-reel-overlay { position:fixed; inset:0; z-index:95; overflow:hidden; pointer-events:none; contain:strict; }
 .language-reel-slot { position:fixed; overflow:hidden; contain:paint; }
 .language-reel-track { position:absolute; inset:0 auto auto 0; width:100%; display:flex; flex-direction:column; will-change:transform,opacity; }
@@ -91,8 +91,8 @@ body.language-switching .language-toggle { pointer-events:none; opacity:.72; }
 .language-reel-new { z-index:97; }
 .language-reel-old .language-reel-track { opacity:1; }
 .language-reel-new .language-reel-track { opacity:0; }
-.language-reel-old.is-spinning .language-reel-track { animation:languageTrackOld .873s cubic-bezier(.22,.74,.2,1) var(--reel-delay) both; }
-.language-reel-new.is-spinning .language-reel-track { animation:languageTrackNew .873s cubic-bezier(.18,.78,.2,1) var(--reel-delay) both; }
+.language-reel-old.is-spinning .language-reel-track { animation:languageTrackOld .3s cubic-bezier(.22,.74,.2,1) var(--reel-delay) both; }
+.language-reel-new.is-spinning .language-reel-track { animation:languageTrackNew .3s cubic-bezier(.18,.78,.2,1) var(--reel-delay) both; }
 
 @keyframes languageTrackOld {
   0% { transform:translateY(0); opacity:1; }

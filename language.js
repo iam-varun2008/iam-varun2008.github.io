@@ -339,7 +339,7 @@
       slot.style.width = `${rect.width}px`;
       slot.style.height = `${rect.height}px`;
       slot.style.setProperty("--reel-height", `${rect.height}px`);
-      slot.style.setProperty("--reel-delay", `${(index % 8) * 6}ms`);
+      slot.style.setProperty("--reel-delay", "0ms");
 
       const track = document.createElement("div");
       track.className = "language-reel-track";
@@ -422,7 +422,7 @@
       oldScene.classList.add("is-spinning");
       oldLayer.classList.add("is-spinning");
       newLayer.classList.add("is-spinning");
-      await wait(930);
+      await wait(340);
 
       newElements.forEach(element => element.classList.remove("language-reel-source-hidden"));
       oldScene.remove();
