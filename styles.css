@@ -65,6 +65,10 @@ img { display: block; max-width: 100%; }
 .cursor.is-view { width: 74px; height: 74px; mix-blend-mode: normal; }
 .cursor.is-view span { opacity:1; }
 
+@media (pointer:fine) {
+  html,body,body * { cursor:none !important; }
+}
+
 .mobile-header, .mobile-menu { display: none; }
 .brand-chip { display:inline-flex; align-items:flex-start; background:var(--yellow); border-radius:8px; padding:9px 12px 8px; font-size:15px; line-height:1; font-weight:900; letter-spacing:-.05em; }
 .brand-chip sup { font-size:7px; margin-left:2px; }
