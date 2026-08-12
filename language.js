@@ -323,6 +323,42 @@
     "text-decoration", "white-space", "color", "direction"
   ];
 
+  const segmentText = value => window.Intl?.Segmenter
+    ? [...new Intl.Segmenter(undefined, { granularity:"grapheme" }).segment(value)].map(part => part.segment)
+    : Array.from(value);
+
+  function makeCharacterRoller(source, computed) {
+    const roller = document.createElement("span");
+    roller.className = "language-character-roller";
+    const text = source.textContent || "";
+    const characters = segmentText(text);
+
+    if (!characters.some(character => character.trim())) return null;
+    characters.forEach((character, index) => {
+      if (/\s/.test(character)) {
+        roller.append(document.createTextNode(character));
+        return;
+      }
+      const slot = document.createElement("span");
+      slot.className = "language-character-slot";
+      slot.style.setProperty("--character-delay", `${Math.min(index, 18) * 2}ms`);
+      const track = document.createElement("span");
+      track.className = "language-character-track";
+      for (let copyIndex = 0; copyIndex < 5; copyIndex += 1) {
+        const copy = document.createElement("span");
+        copy.className = "language-character-copy";
+        copy.textContent = character;
+        track.append(copy);
+      }
+      slot.append(track);
+      roller.append(slot);
+    });
+
+    reelStyleProperties.forEach(property => roller.style.setProperty(property, computed.getPropertyValue(property)));
+    roller.style.opacity = computed.opacity;
+    return roller;
+  }
+
   function makeLanguageReelLayer(elements, phase) {
     const layer = document.createElement("div");
     layer.className = `language-reel-overlay language-reel-${phase}`;
@@ -341,33 +377,9 @@
       slot.style.setProperty("--reel-height", `${rect.height}px`);
       slot.style.setProperty("--reel-delay", "0ms");
 
-      const track = document.createElement("div");
-      track.className = "language-reel-track";
-      for (let copyIndex = 0; copyIndex < 4; copyIndex += 1) {
-        const copy = document.createElement("div");
-        copy.className = "language-reel-copy";
-        const clone = element.cloneNode(true);
-        clone.removeAttribute("id");
-        qsa("[id]", clone).forEach(child => child.removeAttribute("id"));
-        clone.classList.remove("language-spin-item");
-        clone.classList.add("language-reel-clone");
-        reelStyleProperties.forEach(property => clone.style.setProperty(property, computed.getPropertyValue(property)));
-        clone.style.opacity = computed.opacity;
-        clone.style.animation = "none";
-        clone.style.transition = "none";
-        qsa("*", clone).forEach(child => {
-          child.style.animation = "none";
-          child.style.transition = "none";
-          child.style.transform = "none";
-          child.style.translate = "none";
-          child.style.filter = "none";
-          child.style.opacity = "1";
-          child.style.visibility = "visible";
-        });
-        copy.append(clone);
-        track.append(copy);
-      }
-      slot.append(track);
+      const roller = makeCharacterRoller(element, computed);
+      if (!roller) return;
+      slot.append(roller);
       layer.append(slot);
     });
 
