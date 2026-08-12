@@ -271,10 +271,15 @@
     }).map(element => {
       if (element.matches(".text-word")) return element.closest("[data-text-reveal-ready]") || element;
       if (element.matches(".hero-letter")) return element.closest(".hero-word") || element;
+      if (element.matches(".nav-label-primary")) return element.closest("[data-nav-roll-ready]") || element;
+      if (element.matches(".button-label-primary")) return element.closest("[data-button-roll-ready]") || element;
+      if (element.matches(".roll-line")) return element.closest("[data-roll-ready]") || element;
+      if (element.matches(".mega-roll-line")) return element.parentElement || element;
       return element;
     });
 
-    return [...new Set(candidates)].filter(element => {
+    const unique = [...new Set(candidates)];
+    return unique.filter(element => !unique.some(parent => parent !== element && parent.contains(element))).filter(element => {
       const style = getComputedStyle(element);
       const rect = element.getBoundingClientRect();
       const margin = 24;
@@ -312,6 +317,88 @@
     return Promise.all(animations);
   }
 
+  const reelStyleProperties = [
+    "font-family", "font-size", "font-style", "font-weight", "line-height",
+    "letter-spacing", "word-spacing", "text-align", "text-transform",
+    "text-decoration", "white-space", "color", "direction"
+  ];
+
+  function makeLanguageReelLayer(elements, phase) {
+    const layer = document.createElement("div");
+    layer.className = `language-reel-overlay language-reel-${phase}`;
+    layer.setAttribute("aria-hidden", "true");
+
+    elements.forEach((element, index) => {
+      const rect = element.getBoundingClientRect();
+      if (rect.width < 1 || rect.height < 1) return;
+      const computed = getComputedStyle(element);
+      const slot = document.createElement("div");
+      slot.className = "language-reel-slot";
+      slot.style.left = `${rect.left}px`;
+      slot.style.top = `${rect.top}px`;
+      slot.style.width = `${rect.width}px`;
+      slot.style.height = `${rect.height}px`;
+      slot.style.setProperty("--reel-height", `${rect.height}px`);
+      slot.style.setProperty("--reel-delay", `${(index % 8) * 18}ms`);
+
+      const track = document.createElement("div");
+      track.className = "language-reel-track";
+      for (let copyIndex = 0; copyIndex < 4; copyIndex += 1) {
+        const copy = document.createElement("div");
+        copy.className = "language-reel-copy";
+        const clone = element.cloneNode(true);
+        clone.removeAttribute("id");
+        qsa("[id]", clone).forEach(child => child.removeAttribute("id"));
+        clone.classList.remove("language-spin-item");
+        clone.classList.add("language-reel-clone");
+        reelStyleProperties.forEach(property => clone.style.setProperty(property, computed.getPropertyValue(property)));
+        clone.style.opacity = computed.opacity;
+        clone.style.animation = "none";
+        clone.style.transition = "none";
+        qsa("*", clone).forEach(child => {
+          child.style.animation = "none";
+          child.style.transition = "none";
+          child.style.transform = "none";
+          child.style.translate = "none";
+          child.style.filter = "none";
+          child.style.opacity = "1";
+          child.style.visibility = "visible";
+        });
+        copy.append(clone);
+        track.append(copy);
+      }
+      slot.append(track);
+      layer.append(slot);
+    });
+
+    return layer;
+  }
+
+  function makeLanguageSceneLayer(elements, scrollPosition) {
+    elements.forEach((element, index) => {
+      element.dataset.languageReelMask = String(index);
+      qsa("*", element).forEach(child => child.dataset.languageReelMaskChild = "");
+    });
+
+    const scene = document.createElement("div");
+    scene.className = "language-reel-scene";
+    scene.setAttribute("aria-hidden", "true");
+
+    qsa(".sidebar,.mobile-header,.mobile-menu").forEach(element => scene.append(element.cloneNode(true)));
+    const scrollScene = document.createElement("div");
+    scrollScene.className = "language-reel-scene-scroll";
+    scrollScene.style.top = `${-scrollPosition}px`;
+    const main = qs("main");
+    if (main) scrollScene.append(main.cloneNode(true));
+    scene.append(scrollScene);
+
+    elements.forEach(element => {
+      delete element.dataset.languageReelMask;
+      qsa("[data-language-reel-mask-child]", element).forEach(child => delete child.dataset.languageReelMaskChild);
+    });
+    return scene;
+  }
+
   async function switchLanguage(language) {
     if (document.body.classList.contains("language-switching") || language === window.portfolioLanguage) return;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -321,20 +408,38 @@
     document.body.classList.add("language-switching");
 
     if (!reduced) {
-      oldElements.forEach(element => element.classList.add("language-spin-item"));
-      await animateLanguageReel(oldElements, "out");
+      const oldLayer = makeLanguageReelLayer(oldElements, "old");
+      const oldScene = makeLanguageSceneLayer(oldElements, scrollYBefore);
+      applyLanguage(language);
+      window.scrollTo(0, scrollYBefore);
+      const newElements = getVisibleTextElements();
+      const newLayer = makeLanguageReelLayer(newElements, "new");
+      newElements.forEach(element => element.classList.add("language-reel-source-hidden"));
+
+      document.body.append(oldScene, oldLayer, newLayer);
+
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      oldScene.classList.add("is-spinning");
+      oldLayer.classList.add("is-spinning");
+      newLayer.classList.add("is-spinning");
+      await wait(2650);
+
+      newElements.forEach(element => element.classList.remove("language-reel-source-hidden"));
+      oldScene.remove();
+      oldLayer.remove();
+      newLayer.remove();
+      qsa(".language-spin-item").forEach(element => element.classList.remove("language-spin-item"));
+      document.body.classList.remove("language-switching");
+      window.dispatchEvent(new CustomEvent("portfolio:languagechange", { detail:{ language } }));
+      window.ScrollTrigger?.refresh();
+      return;
     }
 
     applyLanguage(language);
     window.scrollTo(0, scrollYBefore);
     const newElements = getVisibleTextElements();
 
-    if (!reduced) {
-      newElements.forEach(element => element.classList.add("language-spin-item"));
-      await animateLanguageReel(newElements, "in");
-    } else {
-      await wait(40);
-    }
+    await wait(40);
 
     qsa(".language-spin-item").forEach(element => element.classList.remove("language-spin-item"));
     document.body.classList.remove("language-switching");
