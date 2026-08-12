@@ -263,36 +263,47 @@
     const selector = "main,aside,.mobile-header,.mobile-menu";
     const containers = qsa(selector);
     const all = containers.flatMap(container => [container, ...qsa("*", container)]);
-    return [...new Set(all)].filter(element => {
+    const candidates = all.filter(element => {
       if (element.closest(".language-toggle,.cursor,.image-viewer")) return false;
       if (element.matches("script,style,input,textarea,video,img,svg,path,br,sup,.nav-label-clone,.button-label-clone")) return false;
       if (![...element.childNodes].some(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim())) return false;
+      return true;
+    }).map(element => {
+      if (element.matches(".text-word")) return element.closest("[data-text-reveal-ready]") || element;
+      if (element.matches(".hero-letter")) return element.closest(".hero-word") || element;
+      return element;
+    });
+
+    return [...new Set(candidates)].filter(element => {
       const style = getComputedStyle(element);
       const rect = element.getBoundingClientRect();
-      return style.display !== "none" && style.visibility !== "hidden" && rect.width > 0 && rect.height > 0;
+      const margin = 24;
+      const intersectsViewport = rect.bottom > -margin && rect.top < innerHeight + margin && rect.right > -margin && rect.left < innerWidth + margin;
+      return style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) > .02 && rect.width > 0 && rect.height > 0 && intersectsViewport;
     });
   }
 
   const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
   function animateLanguageReel(elements, direction) {
-    const shuffled = [...elements].sort(() => Math.random() - .5);
+    const ordered = [...elements].sort((first, second) => {
+      const firstRect = first.getBoundingClientRect();
+      const secondRect = second.getBoundingClientRect();
+      return firstRect.top - secondRect.top || firstRect.left - secondRect.left;
+    });
     const outgoing = direction === "out";
-    const duration = outgoing ? 420 : 660;
-    const delayRange = outgoing ? 220 : 320;
-    const easing = outgoing ? "cubic-bezier(.7,0,.84,0)" : "cubic-bezier(.16,1,.3,1)";
-    const animations = shuffled.map((element, index) => {
+    const duration = outgoing ? 230 : 390;
+    const delayRange = outgoing ? 90 : 150;
+    const easing = outgoing ? "cubic-bezier(.55,.06,.68,.19)" : "cubic-bezier(.16,1,.3,1)";
+    const animations = ordered.map((element, index) => {
       const current = getComputedStyle(element);
-      const restTransform = current.transform === "none" ? "translateY(0) rotateX(0deg)" : current.transform;
-      const restFilter = current.filter === "none" ? "blur(0px)" : current.filter;
       const restOpacity = current.opacity;
-      const reelTransform = outgoing ? "translateY(-115%) rotateX(72deg)" : "translateY(118%) rotateX(-72deg)";
       const frames = outgoing
-        ? [{ transform:restTransform, filter:restFilter, opacity:restOpacity }, { transform:reelTransform, filter:"blur(7px)", opacity:0 }]
-        : [{ transform:reelTransform, filter:"blur(7px)", opacity:0 }, { transform:restTransform, filter:restFilter, opacity:restOpacity }];
+        ? [{ translate:"0 0", opacity:restOpacity }, { translate:"0 -108%", opacity:0 }]
+        : [{ translate:"0 108%", opacity:0 }, { translate:"0 0", opacity:restOpacity }];
       const animation = element.animate(frames, {
         duration,
-        delay:(index / Math.max(1, shuffled.length - 1)) * delayRange,
+        delay:(index / Math.max(1, ordered.length - 1)) * delayRange,
         easing,
         fill:"none"
       });
@@ -304,6 +315,7 @@
   async function switchLanguage(language) {
     if (document.body.classList.contains("language-switching") || language === window.portfolioLanguage) return;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    qsa(".language-spin-item").forEach(element => element.classList.remove("language-spin-item"));
     const oldElements = getVisibleTextElements();
     const scrollYBefore = window.scrollY;
     document.body.classList.add("language-switching");
@@ -324,8 +336,7 @@
       await wait(40);
     }
 
-    oldElements.forEach(element => element.classList.remove("language-spin-item"));
-    newElements.forEach(element => element.classList.remove("language-spin-item"));
+    qsa(".language-spin-item").forEach(element => element.classList.remove("language-spin-item"));
     document.body.classList.remove("language-switching");
     window.dispatchEvent(new CustomEvent("portfolio:languagechange", { detail:{ language } }));
     window.ScrollTrigger?.refresh();

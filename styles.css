@@ -75,18 +75,8 @@ body.language-pending .cursor { visibility:visible!important; z-index:2100; left
 body.intro-complete .language-toggle { opacity:1; transform:translateY(0); pointer-events:auto; }
 .language-toggle:hover { box-shadow:0 12px 34px rgba(30,28,22,.15); }
 .language-toggle:active { transform:scale(.95); }
-body.language-switching .language-toggle { pointer-events:none; }
-body.language-switching .language-toggle::before { animation:toggleJackpot .22s linear infinite alternate; }
-.language-spin-item { transform-origin:center center; backface-visibility:hidden; will-change:transform,filter,opacity; }
-@keyframes toggleJackpot { from { transform:translateX(5px); } to { transform:translateX(43px); } }
-body.language-switching .language-toggle[data-active="ko"]::before { animation-name:toggleJackpotReverse; }
-@keyframes toggleJackpotReverse { from { transform:translateX(43px); } to { transform:translateX(5px); } }
-@media (max-width:900px) {
-  body.language-switching .language-toggle::before { animation-name:toggleJackpotMobile; }
-  body.language-switching .language-toggle[data-active="ko"]::before { animation-name:toggleJackpotMobileReverse; }
-}
-@keyframes toggleJackpotMobile { from { transform:translateX(4px); } to { transform:translateX(37px); } }
-@keyframes toggleJackpotMobileReverse { from { transform:translateX(37px); } to { transform:translateX(4px); } }
+body.language-switching .language-toggle { pointer-events:none; opacity:.72; }
+.language-spin-item { backface-visibility:hidden; will-change:translate,opacity; }
 
 @media (pointer:fine) {
   html,body,body * { cursor:none !important; }
@@ -824,5 +814,4 @@ html[lang="ko"] .foundation-heading h3 { letter-spacing:-.065em; }
   .project-gallery.has-controls img:first-child { opacity:0; }
   .project-gallery.has-controls img.is-active { opacity:1; }
   .language-toggle,.language-toggle::before { transition:none; }
-  body.language-switching .language-toggle::before { animation:none; }
 }
