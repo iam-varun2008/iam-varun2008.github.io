@@ -8,7 +8,7 @@ document.body.classList.add("is-loading");
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const hasMotion = Boolean(window.gsap && window.ScrollTrigger);
-const uiCopy = window.portfolioCopy || {};
+const getUiCopy = () => window.portfolioCopy || {};
 let lenis = null;
 
 qsa("[data-word-reveal]").forEach(element => {
@@ -17,7 +17,7 @@ qsa("[data-word-reveal]").forEach(element => {
 });
 
 function prepareRollingLines(element) {
-  if (!element || element.dataset.rollReady) return;
+  if (!element || (element.dataset.rollReady && element.querySelector(".roll-line-mask"))) return;
   const lines = element.innerHTML.split(/<br\s*\/?>/i);
   const accessibleText = lines.map(line => {
     const textOnly = document.createElement("span");
@@ -32,7 +32,7 @@ function prepareRollingLines(element) {
 qsa(".about .section-heading h2,.technical-foundation h3,.work-intro h2,.services .section-heading h2,.testimonials .section-heading h2,.contact .section-heading h2,.timeline-card h3,.art-caption h3,.goal-card h3").forEach(prepareRollingLines);
 
 function prepareTextReveal(element) {
-  if (!element || element.dataset.textRevealReady) return;
+  if (!element || (element.dataset.textRevealReady && element.querySelector(".text-word"))) return;
   const text = element.textContent.trim();
   if (!text) return;
   element.dataset.textRevealReady = "true";
@@ -62,6 +62,7 @@ function prepareTextReveal(element) {
     }
     if (node.nodeType !== Node.ELEMENT_NODE) return;
     const wrapper = node.matches(".inline-full-name") ? node.cloneNode(false) : parent;
+    if (wrapper !== parent) wrapper.removeAttribute("data-text-reveal-ready");
     if (wrapper !== parent) parent.append(wrapper);
     [...node.childNodes].forEach(child => rebuild(child, wrapper));
   };
@@ -77,7 +78,7 @@ qsa(".mega-title > span").forEach(line => {
 });
 
 function prepareNavigationLabel(element) {
-  if (!element || element.dataset.navRollReady) return;
+  if (!element || (element.dataset.navRollReady && element.querySelector(".nav-label-mask"))) return;
   const text = element.textContent.trim();
   element.dataset.navRollReady = "true";
   element.setAttribute("aria-label", text);
@@ -87,7 +88,7 @@ function prepareNavigationLabel(element) {
 qsa(".hero-nav a,.side-label").forEach(prepareNavigationLabel);
 
 function prepareButtonRoll(element) {
-  if (!element || element.dataset.buttonRollReady) return;
+  if (!element || (element.dataset.buttonRollReady && element.querySelector(".button-label-mask"))) return;
   const text = element.textContent.trim();
   element.dataset.buttonRollReady = "true";
   element.setAttribute("aria-label", text);
@@ -95,6 +96,22 @@ function prepareButtonRoll(element) {
 }
 
 qsa(".book-button,.call-chip,.hero-actions a:first-child,.contact-form button,.certificate-link").forEach(prepareButtonRoll);
+
+window.refreshPortfolioTranslations = () => {
+  qsa(".about .section-heading h2,.technical-foundation h3,.work-intro h2,.services .section-heading h2,.testimonials .section-heading h2,.contact .section-heading h2,.timeline-card h3,.art-caption h3,.goal-card h3").forEach(prepareRollingLines);
+  qsa(".about .section-heading > p,.timeline-card > p,.foundation-group dd,.work-intro > p,.project-info p,.services .section-heading > p,.art-caption p,.testimonials .section-heading > p,.goal-card > p,.goal-card footer small,.contact .section-heading > p,.contact-card strong,.contact-card b,.contact-form label > span,.contact-form > small").forEach(prepareTextReveal);
+  qsa(".hero-nav a,.side-label").forEach(prepareNavigationLabel);
+  qsa(".book-button,.call-chip,.hero-actions a:first-child,.contact-form button,.certificate-link").forEach(prepareButtonRoll);
+
+  const copy = getUiCopy();
+  qsa(".gallery-prev").forEach(button => button.setAttribute("aria-label", copy.previousScreenshot || "Previous project screenshot"));
+  qsa(".gallery-next").forEach(button => button.setAttribute("aria-label", copy.nextScreenshot || "Next project screenshot"));
+  qsa(".gallery-expand").forEach(button => button.setAttribute("aria-label", copy.viewFullImage || "View screenshot full size"));
+  qs(".image-viewer")?.setAttribute("aria-label", copy.imageViewer || "Project screenshot viewer");
+  qs(".viewer-prev")?.setAttribute("aria-label", copy.previousScreenshot || "Previous project screenshot");
+  qs(".viewer-next")?.setAttribute("aria-label", copy.nextScreenshot || "Next project screenshot");
+  qs(".viewer-close")?.setAttribute("aria-label", copy.closeViewer || "Close image viewer");
+};
 
 const galleryStates = [];
 qsa(".project-gallery").forEach(gallery => {
@@ -107,10 +124,10 @@ qsa(".project-gallery").forEach(gallery => {
     images.forEach((image, imageIndex) => image.classList.toggle("is-active", imageIndex === state.activeIndex));
     if (state.count) state.count.textContent = `${String(state.activeIndex + 1).padStart(2, "0")} / ${String(images.length).padStart(2, "0")}`;
   };
-  gallery.insertAdjacentHTML("beforeend", `<button class="gallery-expand" type="button" aria-label="${uiCopy.viewFullImage || "View screenshot full size"}">↗</button>`);
+  gallery.insertAdjacentHTML("beforeend", `<button class="gallery-expand" type="button" aria-label="${getUiCopy().viewFullImage || "View screenshot full size"}">↗</button>`);
   if (images.length > 1) {
     gallery.classList.add("has-controls");
-    gallery.insertAdjacentHTML("beforeend", `<button class="gallery-control gallery-prev" type="button" aria-label="${uiCopy.previousScreenshot || "Previous project screenshot"}">&#8592;</button><button class="gallery-control gallery-next" type="button" aria-label="${uiCopy.nextScreenshot || "Next project screenshot"}">&#8594;</button><span class="gallery-count" aria-live="polite"></span>`);
+    gallery.insertAdjacentHTML("beforeend", `<button class="gallery-control gallery-prev" type="button" aria-label="${getUiCopy().previousScreenshot || "Previous project screenshot"}">&#8592;</button><button class="gallery-control gallery-next" type="button" aria-label="${getUiCopy().nextScreenshot || "Next project screenshot"}">&#8594;</button><span class="gallery-count" aria-live="polite"></span>`);
     state.count = qs(".gallery-count", gallery);
     qs(".gallery-prev", gallery).addEventListener("click", event => { event.stopPropagation(); state.showImage(state.activeIndex - 1); });
     qs(".gallery-next", gallery).addEventListener("click", event => { event.stopPropagation(); state.showImage(state.activeIndex + 1); });
@@ -122,7 +139,7 @@ qsa(".project-gallery").forEach(gallery => {
 let activeViewerGallery = null;
 let viewerReturnFocus = null;
 if (galleryStates.length) {
-  document.body.insertAdjacentHTML("beforeend", `<div class="image-viewer" role="dialog" aria-modal="true" aria-hidden="true" aria-label="${uiCopy.imageViewer || "Project screenshot viewer"}"><div class="image-viewer-dialog"><img src="" alt="" /><p class="image-viewer-caption" aria-live="polite"></p><button class="viewer-control viewer-prev" type="button" aria-label="${uiCopy.previousScreenshot || "Previous project screenshot"}">←</button><button class="viewer-control viewer-next" type="button" aria-label="${uiCopy.nextScreenshot || "Next project screenshot"}">→</button><button class="viewer-control viewer-close" type="button" aria-label="${uiCopy.closeViewer || "Close image viewer"}">×</button></div></div>`);
+  document.body.insertAdjacentHTML("beforeend", `<div class="image-viewer" role="dialog" aria-modal="true" aria-hidden="true" aria-label="${getUiCopy().imageViewer || "Project screenshot viewer"}"><div class="image-viewer-dialog"><img src="" alt="" /><p class="image-viewer-caption" aria-live="polite"></p><button class="viewer-control viewer-prev" type="button" aria-label="${getUiCopy().previousScreenshot || "Previous project screenshot"}">←</button><button class="viewer-control viewer-next" type="button" aria-label="${getUiCopy().nextScreenshot || "Next project screenshot"}">→</button><button class="viewer-control viewer-close" type="button" aria-label="${getUiCopy().closeViewer || "Close image viewer"}">×</button></div></div>`);
   const viewer = qs(".image-viewer");
   const viewerImage = qs(".image-viewer img");
   const viewerCaption = qs(".image-viewer-caption");
@@ -590,6 +607,7 @@ function createMotionScenes() {
 const menuButton = qs(".menu-button");
 const mobileMenu = qs(".mobile-menu");
 menuButton?.addEventListener("click", () => {
+  const uiCopy = getUiCopy();
   const open = !mobileMenu.classList.contains("open");
   mobileMenu.classList.toggle("open", open);
   mobileMenu.setAttribute("aria-hidden", String(!open));
@@ -599,6 +617,7 @@ menuButton?.addEventListener("click", () => {
   if (open) qs("a", mobileMenu)?.focus();
 });
 qsa(".mobile-menu a").forEach(link => link.addEventListener("click", () => {
+  const uiCopy = getUiCopy();
   mobileMenu.classList.remove("open");
   mobileMenu.setAttribute("aria-hidden", "true");
   menuButton.setAttribute("aria-expanded", "false");
@@ -607,6 +626,7 @@ qsa(".mobile-menu a").forEach(link => link.addEventListener("click", () => {
   if (innerWidth <= 900) setTimeout(() => qs(link.getAttribute("href"))?.scrollIntoView({ block:"start" }), 0);
 }));
 document.addEventListener("keydown", event => {
+  const uiCopy = getUiCopy();
   if (event.key !== "Escape" || !mobileMenu?.classList.contains("open")) return;
   mobileMenu.classList.remove("open");
   mobileMenu.setAttribute("aria-hidden", "true");
@@ -619,6 +639,7 @@ document.addEventListener("keydown", event => {
 
 const toast = qs(".toast");
 qs(".email-copy")?.addEventListener("click", async event => {
+  const uiCopy = getUiCopy();
   try {
     await navigator.clipboard.writeText(event.currentTarget.dataset.copy);
     toast.textContent = uiCopy.emailCopied || "Email copied";
@@ -630,6 +651,7 @@ qs(".email-copy")?.addEventListener("click", async event => {
 });
 
 qsa(".read-more").forEach(button => button.addEventListener("click", () => {
+  const uiCopy = getUiCopy();
   const card = button.closest(".timeline-card");
   const open = card.classList.toggle("open");
   button.textContent = open ? (uiCopy.readLess || "Read less") : (uiCopy.readMore || "Read more");
@@ -688,6 +710,7 @@ qsa(".faq details").forEach(detail => detail.addEventListener("toggle", () => {
 }));
 
 qs("#contact-form")?.addEventListener("submit", event => {
+  const uiCopy = getUiCopy();
   event.preventDefault();
   const data = new FormData(event.currentTarget);
   const name = String(data.get("name") || "").trim();

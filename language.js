@@ -34,17 +34,58 @@
     mailEmail: "이메일"
   };
 
-  const setHtml = (selector, value) => qsa(selector).forEach(element => { element.innerHTML = value; });
-  const setText = (selector, value) => qsa(selector).forEach(element => { element.textContent = value; });
+  const englishMarkup = new Map();
+  const englishAttributes = new Map();
+  const rememberMarkup = element => {
+    if (!englishMarkup.has(element)) englishMarkup.set(element, element.innerHTML);
+  };
+  const rememberAttribute = (element, name) => {
+    if (!englishAttributes.has(element)) englishAttributes.set(element, new Map());
+    const attributes = englishAttributes.get(element);
+    if (!attributes.has(name)) attributes.set(name, element.getAttribute(name));
+  };
+
+  const setHtml = (selector, value) => qsa(selector).forEach(element => {
+    rememberMarkup(element);
+    element.innerHTML = value;
+  });
+  const setText = (selector, value) => qsa(selector).forEach(element => {
+    rememberMarkup(element);
+    element.textContent = value;
+  });
   const setList = (selector, values) => qsa(selector).forEach((element, index) => {
-    if (values[index] !== undefined) element.textContent = values[index];
+    if (values[index] === undefined) return;
+    rememberMarkup(element);
+    element.textContent = values[index];
   });
   const setOwnTextList = (selector, values) => qsa(selector).forEach((element, index) => {
     if (values[index] === undefined) return;
+    rememberMarkup(element);
     [...element.childNodes].filter(node => node.nodeType === Node.TEXT_NODE).forEach(node => node.remove());
     element.append(document.createTextNode(` ${values[index]}`));
   });
-  const setAttribute = (selector, name, value) => qsa(selector).forEach(element => element.setAttribute(name, value));
+  const setAttribute = (selector, name, value) => qsa(selector).forEach(element => {
+    rememberAttribute(element, name);
+    element.setAttribute(name, value);
+  });
+
+  function restoreEnglish() {
+    englishMarkup.forEach((markup, element) => {
+      if (element.isConnected) element.innerHTML = markup;
+    });
+    englishAttributes.forEach((attributes, element) => {
+      if (!element.isConnected) return;
+      attributes.forEach((value, name) => {
+        if (value === null) element.removeAttribute(name);
+        else element.setAttribute(name, value);
+      });
+    });
+    document.title = "Nandi Varun Reddy | Computer Science & Cybersecurity Portfolio";
+    const englishDescription = "Computer science and cybersecurity student Nandi Varun Reddy presents practical Python projects in network security, packet analysis, and log analysis.";
+    setAttribute('meta[name="description"]', "content", englishDescription);
+    setAttribute('meta[property="og:title"]', "content", "Nandi Varun Reddy | Computer Science & Cybersecurity Portfolio");
+    setAttribute('meta[property="og:description"]', "content", "A bilingual portfolio of practical Python projects in network security, packet analysis, and log analysis.");
+  }
 
   const gateCursor = qs(".cursor");
   const trackGateCursor = event => {
@@ -205,15 +246,99 @@
     window.portfolioLanguage = isKorean ? "ko" : "en";
     window.portfolioCopy = isKorean ? koreanCopy : englishCopy;
     if (isKorean) applyKorean();
+    else restoreEnglish();
+    window.refreshPortfolioTranslations?.();
+    updateLanguageToggle();
+  }
+
+  function updateLanguageToggle() {
+    const toggle = qs(".language-toggle");
+    if (!toggle) return;
+    const isKorean = window.portfolioLanguage === "ko";
+    toggle.dataset.active = isKorean ? "ko" : "en";
+    toggle.setAttribute("aria-label", isKorean ? "영어로 전환" : "Switch to Korean");
+  }
+
+  function getVisibleTextElements() {
+    const selector = "main,aside,.mobile-header,.mobile-menu";
+    const containers = qsa(selector);
+    const all = containers.flatMap(container => [container, ...qsa("*", container)]);
+    return [...new Set(all)].filter(element => {
+      if (element.closest(".language-toggle,.cursor,.image-viewer")) return false;
+      if (element.matches("script,style,input,textarea,video,img,svg,path,br,sup,.nav-label-clone,.button-label-clone")) return false;
+      if (![...element.childNodes].some(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim())) return false;
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      return style.display !== "none" && style.visibility !== "hidden" && rect.width > 0 && rect.height > 0;
+    });
+  }
+
+  const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+
+  function animateLanguageReel(elements, direction) {
+    const shuffled = [...elements].sort(() => Math.random() - .5);
+    const outgoing = direction === "out";
+    const duration = outgoing ? 420 : 660;
+    const delayRange = outgoing ? 220 : 320;
+    const easing = outgoing ? "cubic-bezier(.7,0,.84,0)" : "cubic-bezier(.16,1,.3,1)";
+    const animations = shuffled.map((element, index) => {
+      const current = getComputedStyle(element);
+      const restTransform = current.transform === "none" ? "translateY(0) rotateX(0deg)" : current.transform;
+      const restFilter = current.filter === "none" ? "blur(0px)" : current.filter;
+      const restOpacity = current.opacity;
+      const reelTransform = outgoing ? "translateY(-115%) rotateX(72deg)" : "translateY(118%) rotateX(-72deg)";
+      const frames = outgoing
+        ? [{ transform:restTransform, filter:restFilter, opacity:restOpacity }, { transform:reelTransform, filter:"blur(7px)", opacity:0 }]
+        : [{ transform:reelTransform, filter:"blur(7px)", opacity:0 }, { transform:restTransform, filter:restFilter, opacity:restOpacity }];
+      const animation = element.animate(frames, {
+        duration,
+        delay:(index / Math.max(1, shuffled.length - 1)) * delayRange,
+        easing,
+        fill:"none"
+      });
+      return animation.finished.catch(() => undefined);
+    });
+    return Promise.all(animations);
+  }
+
+  async function switchLanguage(language) {
+    if (document.body.classList.contains("language-switching") || language === window.portfolioLanguage) return;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const oldElements = getVisibleTextElements();
+    const scrollYBefore = window.scrollY;
+    document.body.classList.add("language-switching");
+
+    if (!reduced) {
+      oldElements.forEach(element => element.classList.add("language-spin-item"));
+      await animateLanguageReel(oldElements, "out");
+    }
+
+    applyLanguage(language);
+    window.scrollTo(0, scrollYBefore);
+    const newElements = getVisibleTextElements();
+
+    if (!reduced) {
+      newElements.forEach(element => element.classList.add("language-spin-item"));
+      await animateLanguageReel(newElements, "in");
+    } else {
+      await wait(40);
+    }
+
+    oldElements.forEach(element => element.classList.remove("language-spin-item"));
+    newElements.forEach(element => element.classList.remove("language-spin-item"));
+    document.body.classList.remove("language-switching");
+    window.dispatchEvent(new CustomEvent("portfolio:languagechange", { detail:{ language } }));
+    window.ScrollTrigger?.refresh();
   }
 
   function loadPortfolio() {
     const script = document.createElement("script");
-    script.src = "app.js?v=20260812-name3";
+    script.src = "app.js?v=20260812-language-reel";
     script.onload = () => {
       window.removeEventListener("pointermove", trackGateCursor);
       document.body.classList.remove("language-pending");
       qs(".language-gate")?.remove();
+      updateLanguageToggle();
     };
     script.onerror = () => {
       document.body.classList.remove("language-pending", "is-loading");
@@ -230,6 +355,11 @@
     qs(".language-gate")?.classList.add("is-leaving");
     setTimeout(loadPortfolio, matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 420);
   }));
+
+  qs(".language-toggle")?.addEventListener("click", () => {
+    const nextLanguage = window.portfolioLanguage === "ko" ? "en" : "ko";
+    switchLanguage(nextLanguage);
+  });
 
   requestAnimationFrame(() => qs('[data-language="en"]')?.focus());
 })();
