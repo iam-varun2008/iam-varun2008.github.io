@@ -199,7 +199,7 @@
 
   function loadPortfolio() {
     const script = document.createElement("script");
-    script.src = "app.js?v=20260812-name2";
+    script.src = "app.js?v=20260812-name3";
     script.onload = () => {
       document.body.classList.remove("language-pending");
       qs(".language-gate")?.remove();

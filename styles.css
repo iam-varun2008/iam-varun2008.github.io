@@ -129,8 +129,8 @@ main { width:100%; }
 .hero-kicker small { display:block; margin-top:13px; font-size:10px; line-height:1.35; letter-spacing:.02em; }
 .hero-kicker small strong,.hero-kicker small span { display:block; }
 .hero-kicker small strong { font-family:"TR3A",Arial,sans-serif; font-size:12px; }
-.hero-full-name { display:inline-block !important; width:max-content; max-width:100%; margin-bottom:5px; padding:5px 8px 4px; border:1px solid rgba(0,0,0,.18); border-radius:5px; background:var(--yellow); color:#000; line-height:1; letter-spacing:-.025em; box-shadow:0 5px 15px rgba(113,104,21,.15); }
-.inline-full-name { padding:0 .2em; border-radius:.18em; background:linear-gradient(transparent 49%,rgba(255,255,0,.82) 49%); color:#000; font-weight:800; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+.hero-full-name { display:inline-flex !important; align-items:center; width:max-content; max-width:none; margin:1px 0 7px; padding:8px 12px 7px; border:1.5px solid #111; border-radius:7px; background:#fffe00; color:#000; font-size:clamp(16px,1.25vw,20px) !important; font-weight:900; line-height:1; letter-spacing:-.035em; white-space:nowrap; box-shadow:4px 4px 0 rgba(17,17,17,.16); }
+.inline-full-name { display:inline-flex; align-items:center; gap:.22em; margin:0 .08em; padding:.16em .42em .13em; border:1.5px solid currentColor; border-radius:.3em; background:#fffe00; color:#000; font-size:1.12em; font-weight:900; line-height:1.15; white-space:nowrap; vertical-align:.03em; box-shadow:2px 2px 0 rgba(17,17,17,.13); }
 .hero-kicker small span { color:rgba(0,0,0,.62); }
 .hero-copy { position:absolute; z-index:5; right:3.7vw; bottom:5%; width:280px; margin:0; font-size:14px; line-height:1.5; will-change:transform,opacity; }
 .stat-card { position:absolute; z-index:5; display:flex; align-items:center; justify-content:center; gap:15px; border-radius:8px; color:#fff; background:rgba(64,60,53,.32); will-change:transform,opacity; }
@@ -417,7 +417,7 @@ main { width:100%; }
   .hero-actions a { min-width:0; border-radius:.56vw; padding:.69vw 1.39vw; font-size:1.18vw; font-weight:500; }
   .hero-actions a:first-child { width:10.23vw; }
   .hero-actions a:last-child { width:9.42vw; }
-  .hero-kicker { left:3.47vw; bottom:5%; width:11vw; font-size:1.18vw; line-height:1.6; }
+  .hero-kicker { left:3.47vw; bottom:5%; width:15vw; font-size:1.18vw; line-height:1.6; }
   .hero-copy { right:3.47vw; bottom:5%; width:21.9vw; font-size:1.18vw; line-height:1.6; }
   .stat-card { gap:.78vw; border-radius:.56vw; background:rgba(194,184,172,.3); }
   .stat-card strong { font-size:3.05vw; }
