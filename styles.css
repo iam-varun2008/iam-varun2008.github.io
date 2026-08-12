@@ -129,6 +129,8 @@ main { width:100%; }
 .hero-kicker small { display:block; margin-top:13px; font-size:10px; line-height:1.35; letter-spacing:.02em; }
 .hero-kicker small strong,.hero-kicker small span { display:block; }
 .hero-kicker small strong { font-family:"TR3A",Arial,sans-serif; font-size:12px; }
+.hero-full-name { display:inline-block !important; width:max-content; max-width:100%; margin-bottom:5px; padding:5px 8px 4px; border:1px solid rgba(0,0,0,.18); border-radius:5px; background:var(--yellow); color:#000; line-height:1; letter-spacing:-.025em; box-shadow:0 5px 15px rgba(113,104,21,.15); }
+.inline-full-name { padding:0 .2em; border-radius:.18em; background:linear-gradient(transparent 49%,rgba(255,255,0,.82) 49%); color:#000; font-weight:800; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
 .hero-kicker small span { color:rgba(0,0,0,.62); }
 .hero-copy { position:absolute; z-index:5; right:3.7vw; bottom:5%; width:280px; margin:0; font-size:14px; line-height:1.5; will-change:transform,opacity; }
 .stat-card { position:absolute; z-index:5; display:flex; align-items:center; justify-content:center; gap:15px; border-radius:8px; color:#fff; background:rgba(64,60,53,.32); will-change:transform,opacity; }
@@ -676,6 +678,7 @@ html[lang="ko"] .hero-word,html[lang="ko"] .loader-word { font-size:25vw; letter
 html[lang="ko"] .hero-title h1 { font-size:clamp(46px,4.7vw,66px); line-height:.98; letter-spacing:-.065em; }
 html[lang="ko"] .timeline-card .year { font-size:clamp(48px,5.1vw,75px); letter-spacing:-.085em; }
 html[lang="ko"] .section-heading h2 { letter-spacing:-.072em; line-height:1; }
+html[lang="ko"] .hero-full-name { font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif; letter-spacing:-.055em; }
 html[lang="ko"] .art-caption h3 { letter-spacing:-.055em; }
 html[lang="ko"] .foundation-heading h3 { letter-spacing:-.065em; }
 

@@ -37,7 +37,36 @@ function prepareTextReveal(element) {
   if (!text) return;
   element.dataset.textRevealReady = "true";
   element.setAttribute("aria-label", text.replace(/\s+/g, " "));
-  element.innerHTML = text.split(/\s+/).map(word => `<span class="text-word" aria-hidden="true">${word}</span>`).join(" ");
+  const sourceNodes = [...element.childNodes];
+  element.replaceChildren();
+
+  const appendWords = (value, parent) => {
+    value.split(/(\s+)/).forEach(part => {
+      if (!part) return;
+      if (/^\s+$/.test(part)) {
+        parent.append(document.createTextNode(" "));
+        return;
+      }
+      const word = document.createElement("span");
+      word.className = "text-word";
+      word.setAttribute("aria-hidden", "true");
+      word.textContent = part;
+      parent.append(word);
+    });
+  };
+
+  const rebuild = (node, parent) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      appendWords(node.textContent, parent);
+      return;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    const wrapper = node.matches(".inline-full-name") ? node.cloneNode(false) : parent;
+    if (wrapper !== parent) parent.append(wrapper);
+    [...node.childNodes].forEach(child => rebuild(child, wrapper));
+  };
+
+  sourceNodes.forEach(node => rebuild(node, element));
 }
 
 qsa(".about .section-heading > p,.timeline-card > p,.foundation-group dd,.work-intro > p,.project-info p,.services .section-heading > p,.art-caption p,.testimonials .section-heading > p,.goal-card > p,.goal-card footer small,.contact .section-heading > p,.contact-card strong,.contact-card b,.contact-form label > span,.contact-form > small").forEach(prepareTextReveal);

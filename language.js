@@ -49,10 +49,10 @@
   function applyKorean() {
     const nav = ["홈", "소개", "프로젝트", "아트", "목표", "연락처"];
     document.documentElement.lang = "ko";
-    document.title = "Nandi Varun Reddy | 컴퓨터과학 및 사이버보안 포트폴리오";
-    const koreanDescription = "인도 텔랑가나의 컴퓨터과학 및 사이버보안 학생 Nandi Varun Reddy가 Python으로 만든 네트워크 보안, 패킷 분석, 로그 분석 프로젝트를 소개하는 이중 언어 포트폴리오입니다.";
+    document.title = "난디 바룬 레디 | 컴퓨터과학 및 사이버보안 포트폴리오";
+    const koreanDescription = "인도 텔랑가나의 컴퓨터과학 및 사이버보안 학생 난디 바룬 레디가 Python으로 만든 네트워크 보안, 패킷 분석, 로그 분석 프로젝트를 소개하는 이중 언어 포트폴리오입니다.";
     setAttribute('meta[name="description"]', "content", koreanDescription);
-    setAttribute('meta[property="og:title"]', "content", "Nandi Varun Reddy | 컴퓨터과학 및 사이버보안 포트폴리오");
+    setAttribute('meta[property="og:title"]', "content", "난디 바룬 레디 | 컴퓨터과학 및 사이버보안 포트폴리오");
     setAttribute('meta[property="og:description"]', "content", koreanDescription);
     setHtml(".language-mark,.brand-chip", "바룬<sup>®</sup>");
     setText(".hero-word,.loader-word", "바룬");
@@ -63,7 +63,7 @@
     setAttribute(".sidebar", "aria-label", "포트폴리오 내비게이션");
     setAttribute(".socials a:first-child", "aria-label", "바룬의 GitHub");
     setAttribute(".socials a:last-child", "aria-label", "바룬에게 이메일 보내기");
-    setText(".side-intro > p", "Nandi Varun Reddy는 네트워킹, Linux, 윤리적 보안, 위협 탐지를 배우며 실용적인 Python 도구를 만드는 컴퓨터과학 및 사이버보안 학생입니다.");
+    setHtml(".side-intro > p", "<strong class=\"inline-full-name\">난디 바룬 레디</strong>는 네트워킹, Linux, 윤리적 보안, 위협 탐지를 배우며 실용적인 Python 도구를 만드는 컴퓨터과학 및 사이버보안 학생입니다.");
     setHtml(".side-projects-target span", "<b>보안</b> 프로젝트");
     setHtml(".side-years-target span", "인증된<br />수료증");
     setList(".side-label", nav);
@@ -73,8 +73,8 @@
     setAttribute(".client-strip", "aria-label", "기술: Python, Linux, 보안, 아트");
     setText(".book-button", "문의하기");
 
-    setHtml(".hero-kicker", "보안을 만드는 사람.<br />바로 바룬입니다.<small><strong>Nandi Varun Reddy</strong><span>컴퓨터과학 및 사이버보안 학생</span></small>");
-    setAttribute(".hero-photo", "alt", "Nandi Varun Reddy의 인물 사진");
+    setHtml(".hero-kicker", "보안을 만드는 사람.<br />바로 바룬입니다.<small><strong class=\"hero-full-name\">난디 바룬 레디</strong><span>컴퓨터과학 및 사이버보안 학생</span></small>");
+    setAttribute(".hero-photo", "alt", "난디 바룬 레디의 인물 사진");
     setHtml(".hero-title h1", "<span>보안을,</span><span>실전에</span><span>적용하다.</span>");
     setText(".hero-actions a:first-child", "문의하기");
     setText(".hero-actions a:last-child", "소개 보기");
@@ -86,7 +86,7 @@
 
     setText(".about .eyebrow", "학습 · 제작 · 보안");
     setHtml(".about .section-heading h2", "나에 대해 (&amp;)<br />나의 여정");
-    setText(".about .section-heading > p", "저는 인도 텔랑가나 출신의 컴퓨터과학 및 사이버보안에 관심이 있는 학생 Nandi Varun Reddy입니다. Python 프로젝트를 통해 네트워킹, 방어형 보안, 자동화, 위협 탐지를 더욱 실용적으로 이해하고 있습니다. 기술 밖에서는 흑연 드로잉을 통해 인내심, 관찰력, 세부 사항에 대한 주의력을 길렀습니다.");
+    setHtml(".about .section-heading > p", "저는 인도 텔랑가나 출신의 컴퓨터과학 및 사이버보안에 관심이 있는 학생 <strong class=\"inline-full-name\">난디 바룬 레디</strong>입니다. Python 프로젝트를 통해 네트워킹, 방어형 보안, 자동화, 위협 탐지를 더욱 실용적으로 이해하고 있습니다. 기술 밖에서는 흑연 드로잉을 통해 인내심, 관찰력, 세부 사항에 대한 주의력을 길렀습니다.");
     setText(".timeline-card:nth-of-type(1) .year", "10학년");
     setText(".timeline-card:nth-of-type(1) h3", "10학년");
     setText(".timeline-card:nth-of-type(1) > p", "스스로 꾸준히 학습하는 규율을 길러 준 탄탄한 학업 기반입니다.");
@@ -199,7 +199,7 @@
 
   function loadPortfolio() {
     const script = document.createElement("script");
-    script.src = "app.js?v=20260811-admissions3";
+    script.src = "app.js?v=20260812-name2";
     script.onload = () => {
       document.body.classList.remove("language-pending");
       qs(".language-gate")?.remove();
