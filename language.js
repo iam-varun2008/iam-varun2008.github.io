@@ -46,6 +46,16 @@
   });
   const setAttribute = (selector, name, value) => qsa(selector).forEach(element => element.setAttribute(name, value));
 
+  const gateCursor = qs(".cursor");
+  const trackGateCursor = event => {
+    if (!gateCursor) return;
+    gateCursor.style.left = `${event.clientX}px`;
+    gateCursor.style.top = `${event.clientY}px`;
+  };
+  if (gateCursor && matchMedia("(pointer:fine)").matches) {
+    window.addEventListener("pointermove", trackGateCursor, { passive:true });
+  }
+
   function applyKorean() {
     const nav = ["홈", "소개", "프로젝트", "아트", "목표", "연락처"];
     document.documentElement.lang = "ko";
@@ -201,6 +211,7 @@
     const script = document.createElement("script");
     script.src = "app.js?v=20260812-name3";
     script.onload = () => {
+      window.removeEventListener("pointermove", trackGateCursor);
       document.body.classList.remove("language-pending");
       qs(".language-gate")?.remove();
     };

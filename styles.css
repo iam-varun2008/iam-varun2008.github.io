@@ -23,7 +23,7 @@ body { margin: 0; color: var(--ink); background: var(--stone); font-family:"PP N
 body.is-loading { overflow:hidden; }
 body.language-pending { overflow:hidden; }
 body.viewer-open { overflow:hidden; }
-body.language-pending > *:not(.language-gate):not(script) { visibility:hidden; }
+body.language-pending > *:not(.language-gate):not(.cursor):not(script) { visibility:hidden; }
 h1,h2,.hero-button,.hero-title,.stat-card,.traits-card,.brand-chip,.book-button { font-family:"TR3A",Arial,sans-serif; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; }
@@ -64,6 +64,7 @@ img { display: block; max-width: 100%; }
 .cursor span { opacity:0; font-size:10px; font-weight:800; }
 .cursor.is-view { width: 74px; height: 74px; mix-blend-mode: normal; }
 .cursor.is-view span { opacity:1; }
+body.language-pending .cursor { visibility:visible!important; z-index:2100; left:50%; top:50%; }
 
 @media (pointer:fine) {
   html,body,body * { cursor:none !important; }
