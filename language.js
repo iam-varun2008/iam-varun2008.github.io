@@ -34,33 +34,34 @@
     mailEmail: "이메일"
   };
 
-  const englishMarkup = new Map();
+  const englishContent = new Map();
   const englishAttributes = new Map();
-  const rememberMarkup = element => {
-    if (!englishMarkup.has(element)) englishMarkup.set(element, element.innerHTML);
-  };
   const rememberAttribute = (element, name) => {
     if (!englishAttributes.has(element)) englishAttributes.set(element, new Map());
     const attributes = englishAttributes.get(element);
     if (!attributes.has(name)) attributes.set(name, element.getAttribute(name));
   };
+  const rememberContent = element => {
+    if (!englishContent.has(element)) englishContent.set(element, [...element.childNodes]);
+    rememberAttribute(element, "aria-label");
+  };
 
   const setHtml = (selector, value) => qsa(selector).forEach(element => {
-    rememberMarkup(element);
+    rememberContent(element);
     element.innerHTML = value;
   });
   const setText = (selector, value) => qsa(selector).forEach(element => {
-    rememberMarkup(element);
+    rememberContent(element);
     element.textContent = value;
   });
   const setList = (selector, values) => qsa(selector).forEach((element, index) => {
     if (values[index] === undefined) return;
-    rememberMarkup(element);
+    rememberContent(element);
     element.textContent = values[index];
   });
   const setOwnTextList = (selector, values) => qsa(selector).forEach((element, index) => {
     if (values[index] === undefined) return;
-    rememberMarkup(element);
+    rememberContent(element);
     [...element.childNodes].filter(node => node.nodeType === Node.TEXT_NODE).forEach(node => node.remove());
     element.append(document.createTextNode(` ${values[index]}`));
   });
@@ -70,8 +71,8 @@
   });
 
   function restoreEnglish() {
-    englishMarkup.forEach((markup, element) => {
-      if (element.isConnected) element.innerHTML = markup;
+    englishContent.forEach((nodes, element) => {
+      if (element.isConnected) element.replaceChildren(...nodes);
     });
     englishAttributes.forEach((attributes, element) => {
       if (!element.isConnected) return;
@@ -310,15 +311,15 @@
       const restOpacity = current.opacity;
       const frames = outgoing
         ? [
-            { transform:"translate3d(0,0,0)", opacity:restOpacity },
-            { transform:"translate3d(0,-.45em,0)", opacity:0, offset:.72 },
-            { transform:"translate3d(0,-.7em,0)", opacity:0 }
+            { translate:"0 0", opacity:restOpacity },
+            { translate:"0 -.45em", opacity:0, offset:.72 },
+            { translate:"0 -.7em", opacity:0 }
           ]
         : [
-            { transform:"translate3d(0,.55em,0)", opacity:.32 },
-            { transform:"translate3d(0,.12em,0)", opacity:restOpacity, offset:.5 },
-            { transform:"translate3d(0,-.04em,0)", opacity:restOpacity, offset:.84 },
-            { transform:"translate3d(0,0,0)", opacity:restOpacity }
+            { translate:"0 .55em", opacity:.32 },
+            { translate:"0 .12em", opacity:restOpacity, offset:.5 },
+            { translate:"0 -.04em", opacity:restOpacity, offset:.84 },
+            { translate:"0 0", opacity:restOpacity }
           ];
       const animation = element.animate(frames, {
         duration,
