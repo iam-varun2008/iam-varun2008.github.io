@@ -700,16 +700,17 @@ html[lang="ko"] .art-caption h3 { letter-spacing:-.055em; }
 html[lang="ko"] .foundation-heading h3 { letter-spacing:-.065em; }
 
 @media (min-width:901px) {
-  .about { height:335vh; }
+  .about { height:390vh; }
   .about .section-heading { margin-bottom:7vh; }
   .about .section-heading > p { width:34vw; }
-  .about .timeline { height:245vh; }
+  .about .timeline { height:300vh; }
   .about .timeline-card { min-height:42vh; }
   .about .timeline-card:nth-of-type(1) { left:59.91%; top:0; }
-  .about .timeline-card:nth-of-type(2) { left:16.64%; top:19%; }
-  .about .timeline-card:nth-of-type(3) { left:9.4%; top:39%; }
-  .about .timeline-card:nth-of-type(4) { left:49.18%; top:59%; }
-  .about .timeline-card:nth-of-type(5) { left:5.3%; top:79%; }
+  .about .timeline-card:nth-of-type(2) { left:16.64%; top:17%; }
+  .about .timeline-card:nth-of-type(3) { left:9.4%; top:34%; }
+  .about .timeline-card:nth-of-type(4) { left:49.18%; top:51%; }
+  .about .timeline-card:nth-of-type(5) { left:5.3%; top:68%; }
+  .about .timeline-card:nth-of-type(6) { left:49.18%; top:85%; }
   .academic-score { margin-top:2.2vh; font-size:4vw; }
   .academic-score small { font-size:1.25vw; }
   .certificate-link { border-radius:.56vw; padding:.76vw 1vw; font-size:.78vw; }
