@@ -152,14 +152,14 @@
     setText(".timeline-card:nth-of-type(3) h3", "12학년");
     setText(".timeline-card:nth-of-type(3) > p", "인내와 꾸준함, 세부 사항에 대한 집중력을 보여 주는 성적으로 학교 과정을 마쳤습니다.");
     setHtml(".timeline-card:nth-of-type(3) .card-meta > span", "979 / 1000점<br /><em>학업 성적</em>");
-    setText(".timeline-card:nth-of-type(4) h3", "IELTS 아카데믹");
-    setText(".timeline-card:nth-of-type(4) > p", "학업 목적의 듣기, 읽기, 쓰기, 말하기 전 영역에서 높은 영어 능력을 입증한 종합 밴드 점수입니다.");
-    setHtml(".timeline-card:nth-of-type(4) .card-meta > span", "듣기 7.5 · 읽기 7.5 · 쓰기 8.0 · 말하기 6.5<br /><em>종합 밴드 점수 · CEFR C1</em>");
-    setText(".timeline-card:nth-of-type(5) > p", "Harvard University의 CS50에서 제공하는 Python 프로그래밍 입문 과정입니다.");
-    setHtml(".timeline-card:nth-of-type(5) .card-meta > span", "Python 프로그래밍<br /><em>인증된 과정</em>");
-    setText(".timeline-card:nth-of-type(6) h3", "프리 시큐리티 과정");
-    setText(".timeline-card:nth-of-type(6) > p", "컴퓨터, 네트워킹, 웹, 보안의 핵심 기초를 다루는 TryHackMe 프리 시큐리티 학습 경로입니다.");
-    setHtml(".timeline-card:nth-of-type(6) .card-meta > span", "TryHackMe 프리 시큐리티<br /><em>인증된 과정</em>");
+    setText(".timeline-card:nth-of-type(4) > p", "Harvard University의 CS50에서 제공하는 Python 프로그래밍 입문 과정입니다.");
+    setHtml(".timeline-card:nth-of-type(4) .card-meta > span", "Python 프로그래밍<br /><em>인증된 과정</em>");
+    setText(".timeline-card:nth-of-type(5) h3", "프리 시큐리티 과정");
+    setText(".timeline-card:nth-of-type(5) > p", "컴퓨터, 네트워킹, 웹, 보안의 핵심 기초를 다루는 TryHackMe 프리 시큐리티 학습 경로입니다.");
+    setHtml(".timeline-card:nth-of-type(5) .card-meta > span", "TryHackMe 프리 시큐리티<br /><em>인증된 과정</em>");
+    setText(".timeline-card:nth-of-type(6) h3", "IELTS 아카데믹");
+    setText(".timeline-card:nth-of-type(6) > p", "학업 목적의 듣기, 읽기, 쓰기, 말하기 전 영역에서 높은 영어 능력을 입증한 종합 밴드 점수입니다.");
+    setHtml(".timeline-card:nth-of-type(6) .card-meta > span", "듣기 7.5 · 읽기 7.5 · 쓰기 8.0 · 말하기 6.5<br /><em>종합 밴드 점수 · CEFR C1</em>");
     setText(".certificate-link", "수료증 보기 ↗");
 
     setText(".technical-foundation .eyebrow", "현재의 기초");
