@@ -375,7 +375,7 @@
 
   function loadPortfolio() {
     const script = document.createElement("script");
-    script.src = "app.js?v=20260812-language-reel";
+    script.src = "app.js?v=20260821-ielts-timeline";
     script.onload = () => {
       window.removeEventListener("pointermove", trackGateCursor);
       document.body.classList.remove("language-pending");
